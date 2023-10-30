@@ -1,10 +1,11 @@
 package src.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,13 +15,12 @@ import src.config.auth.JwtUtil;
 import src.config.jwt.UserDetailsServiceImpl;
 import src.model.User;
 import src.repository.UserRepository;
-import src.service.User.Dto.AuthenticationDto;
-import src.service.User.Dto.AuthenticationResponse;
-import src.service.User.Dto.SignupDto;
-import src.service.User.Dto.UserDto;
+import src.service.User.Dto.*;
 import src.service.User.auth.AuthService;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @RestController
 @ApiPrefixController(value = "/auth")
@@ -37,30 +37,31 @@ public class AuthenticationController {
     @Autowired
     private AuthService authService;
 
+    // Danh sách token đã hủy
+    private List<String> revokedTokens = new ArrayList<>();
 
-    @PostMapping("/sign-in")
-    public AuthenticationResponse createAuthenticationToken(AuthenticationDto authenticationDto, HttpServletResponse response) throws IOException {
+
+    @PostMapping("/login")
+    public AuthenticationResponse createAuthenticationToken(AuthenticationDto authenticationDto, HttpServletResponse response) throws Exception {
         // Lấy thông tin người dùng từ UserDetailsService
         UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDto.getEmail());
-
-        // Thực hiện xác thực mật khẩu
-        if (isPasswordValid(authenticationDto.getPassword(), userDetails.getPassword())) {
-            // Mật khẩu đúng, tạo token JWT và trả về
+        if (userDetails == null){
+            throw new Exception("Cannot find user with email");
+        }
+        // Xử lý mật khẩu đã băm với mật khẩu nhập
+        if (!JwtUtil.comparePassword(authenticationDto.getPassword(), userDetails.getPassword())){
+            throw new Exception("Password not correct");
+        }
+        else {
+            // Mật khẩu đúng
             String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            response.addHeader("Authorization", "Bearer " + jwt);
             return new AuthenticationResponse(jwt);
-        } else {
-            // Mật khẩu không đúng, xử lý lỗi tại đây
-            throw new BadCredentialsException("Incorrect username or password!");
         }
     }
 
-    private boolean isPasswordValid(String inputPassword, String storedPassword) {
-        // Thực hiện so sánh mật khẩu nhập vào với mật khẩu đã lưu
-        // Bạn có thể sử dụng các phương thức băm và so sánh để kiểm tra tính đúng đắn của mật khẩu
-        // Ở đây, ta sẽ giả sử mật khẩu được lưu trữ ở dạng plaintext để minh họa
-        return inputPassword.equals(storedPassword);
-    }
-    @PostMapping("/sign-up")
+
+    @PostMapping("/signup")
     public ResponseEntity<?> signupUser(@RequestBody SignupDto signupDto) {
         if (isEmailAlreadyTaken(signupDto.getEmail())) {
             return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
@@ -73,9 +74,12 @@ public class AuthenticationController {
     }
 
     private boolean isEmailAlreadyTaken(String email) {
-        // Kiểm tra xem email đã tồn tại trong cơ sở dữ liệu hay chưa
         User existingUser = userRepository.findByEmail(email);
         return existingUser != null;
     }
+
+
+
+
 
 }

@@ -26,10 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
-    private static final String APPLICATION_NAME = "Your Application Name";
-    private static final String SERVICE_ACCOUNT_EMAIL = "your-service-account-email@your-project.iam.gserviceaccount.com";
-    private static final String P12_FILE_PATH = "path/to/your/p12/file.p12";
-    private static final String ROOT_FOLDER_ID = "root";
+
     @Autowired
     private VideoRepository videoRepository;
     @Autowired
