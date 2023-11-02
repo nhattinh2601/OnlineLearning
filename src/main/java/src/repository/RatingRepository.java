@@ -5,4 +5,5 @@ import org.springframework.stereotype.Repository;
 import src.model.Rating;
 @Repository
 public interface RatingRepository extends JpaRepository<Rating, Integer> {
+    Iterable<Rating> findByCourseId(int courseId);
 }

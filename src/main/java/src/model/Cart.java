@@ -37,6 +37,9 @@ public class Cart {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false, insertable = false, updatable = false)
     private User userByUserId;
 
+    public Cart(int id) {
+    }
+
     //// Id  bảng này là khóa ngoại của bảng khác
 
 }

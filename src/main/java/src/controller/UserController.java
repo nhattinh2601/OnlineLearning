@@ -29,10 +29,10 @@ public class UserController {
         return userService.getAll();
     }
 
-    /*@PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<UserDto> create(@RequestBody UserCreateDto input) {
         return userService.create(input);
-    }*/
+    }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<UserDto> update(@PathVariable int id, UserUpdateDto user) {

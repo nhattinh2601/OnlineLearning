@@ -52,4 +52,9 @@ public class CourseController {
                                                                             @RequestParam(required = false, defaultValue = "createAt") String orderBy) {
         return courseService.findAllPagination(request, size, page * size);
     }
+    @GetMapping("/calculateCourseRating")
+    public double calculateCourseRating(@RequestParam int courseId) {
+        return courseService.calculateCourseRating(courseId);
+    }
+
 }

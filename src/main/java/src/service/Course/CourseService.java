@@ -16,7 +16,9 @@ import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Category;
 import src.model.Course;
+import src.model.Rating;
 import src.repository.CourseRepository;
+import src.repository.RatingRepository;
 import src.service.Category.Dto.CategoryDto;
 import src.service.Course.Dto.CourseCreateDto;
 import src.service.Course.Dto.CourseDto;
@@ -32,6 +34,9 @@ import java.util.stream.Collectors;
 public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
+    @Autowired
+    private RatingRepository ratingRepository;
+
     @Autowired
     private ModelMapper toDto;
     @PersistenceContext
@@ -104,6 +109,32 @@ public class CourseService {
         ApiQuery<Category> features = new ApiQuery<>(request, em, Category.class, pagination);
         return CompletableFuture.completedFuture(PagedResultDto.create(pagination,
                 features.filter().orderBy().paginate().exec().stream().map(x -> toDto.map(x, CourseDto.class)).toList()));
+    }
+
+    @Async
+    public double calculateCourseRating(int courseId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course == null) {
+            return -1; // Hoặc sử dụng mã lỗi khác tùy theo yêu cầu của bạn
+        }
+
+        Iterable<Rating> ratings = ratingRepository.findByCourseId(courseId);
+
+        int totalRatings = 0;
+        double totalRatingValue = 0.0;
+
+        for (Rating rating : ratings) {
+            totalRatings++;
+            totalRatingValue += rating.getRating();
+        }
+
+        if (totalRatings == 0) {
+            return 0;
+        }
+
+        double averageRating = totalRatingValue / totalRatings;
+
+        return averageRating;
     }
 
 }

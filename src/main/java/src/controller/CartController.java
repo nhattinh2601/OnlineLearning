@@ -2,21 +2,22 @@ package src.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import src.config.annotation.ApiPrefixController;
+import src.config.annotation.Authenticate;
 import src.config.dto.PagedResultDto;
-import src.model.Cart;
+
 import src.service.Cart.CartService;
-import src.service.Cart.Dto.CartCreateDto;
 import src.service.Cart.Dto.CartDto;
 import src.service.Cart.Dto.CartUpdateDto;
-import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
-import src.service.CourseRegister.Dto.CourseRegisterDto;
+
 
 import java.util.List;
+
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -24,6 +25,7 @@ import java.util.concurrent.CompletableFuture;
 public class CartController {
     @Autowired
     private CartService cartService;
+
 
     @GetMapping()
     public CompletableFuture<List<CartDto>> findAll() {
@@ -42,9 +44,11 @@ public class CartController {
         return cartService.findAllPagination(request, size, page * size);
     }
 
+    @Authenticate
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public CompletableFuture<CartDto> create(@RequestBody CartCreateDto input) {
-        return cartService.create(input);
+    public CompletableFuture<CartDto> create() {
+        int userId = ((int) (((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest().getAttribute("id")));
+        return cartService.create(userId);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

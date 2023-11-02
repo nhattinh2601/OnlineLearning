@@ -13,21 +13,15 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Cart;
-import src.model.CourseRegister;
 import src.repository.CartRepository;
-import src.service.Cart.Dto.CartCreateDto;
 import src.service.Cart.Dto.CartDto;
 import src.service.Cart.Dto.CartUpdateDto;
-import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
-import src.service.CourseRegister.Dto.CourseRegisterDto;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static java.sql.Types.NULL;
 
 @Service
 public class CartService {
@@ -57,13 +51,9 @@ public class CartService {
     }
 
     @Async
-    public CompletableFuture<CartDto> create(CartCreateDto input) {
-        Cart cart = new Cart();
-        cart.setCourseId(input.getCourseId());
-        cart.setUserId(input.getUserId());
-
-        Cart savedCart = cartRepository.save(cart);
-        return CompletableFuture.completedFuture(toDto.map(savedCart, CartDto.class));
+    public CompletableFuture<CartDto> create(int userId) {
+        Cart cart = new Cart(userId);
+        return CompletableFuture.completedFuture(toDto.map(cartRepository.save(cart), CartDto.class));
     }
 
     @Async
@@ -102,4 +92,5 @@ public class CartService {
             return CompletableFuture.completedFuture("Xóa không được");
         }
     }
+
 }

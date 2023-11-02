@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,14 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.server.ResponseStatusException;
+import src.config.auth.JwtTokenUtil;
 import src.config.dto.PagedResultDto;
 
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
+import src.model.Cart;
 import src.model.Rating;
 import src.model.Role;
 import src.model.User;
+import src.repository.CartRepository;
 import src.repository.RoleRepository;
 import src.repository.UserRepository;
 import src.service.Rating.Dto.RatingDto;
@@ -52,6 +56,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class UserService {
     EntityManager em;
     private UserRepository userRepository;
+    private CartRepository cartRepository;
     private ModelMapper toDto;
     private RoleRepository roleRepository;
     int roleId;
@@ -80,20 +85,19 @@ public class UserService {
         return CompletableFuture.completedFuture(toDto.map(user, UserDto.class));
     }
 
- /*   @Async
+   @Async
     public CompletableFuture<UserDto> create(UserCreateDto input) {
-        roleId = roleRepository.findByName("User").orElse(null).getId();
-        input.setHashedPassword(JwtTokenUtil.hashPassword(input.getHashedPassword()));
-//        input.setHashedPassword(jwtUtil.g);
+        roleId = roleRepository.findByName("user").orElse(null).getId();
+        input.setPassword(JwtTokenUtil.hashPassword(input.getPassword()));
         input.setRoleId(roleId);
         User user = userRepository.save(toDto.map(input, User.class));
         // tao cart
-        cartRepository.save(new Cart(user.getId()));
+        /*cartRepository.save(new Cart(user.getId()));*/
         toDto.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return CompletableFuture.completedFuture(toDto.map(user, UserDto.class));
-    }*/
+    }
 
-    @Async
+   /* @Async
     public CompletableFuture<UserDto> create(UserCreateDto input) {
         User user = new User();
 
@@ -110,7 +114,7 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         return CompletableFuture.completedFuture(toDto.map(savedUser, UserDto.class));
-    }
+    }*/
 
 
     @Async
@@ -148,7 +152,7 @@ public class UserService {
         }
     }
 
- /*   @Override
+    @Async
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByEmail(username);
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
@@ -160,7 +164,7 @@ public class UserService {
             authorities.add(new SimpleGrantedAuthority(user.getRoleByRoleId().getName()));
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
         }
-    }*/
+    }
 
 
 }
