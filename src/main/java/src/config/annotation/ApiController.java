@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @RestController
 @RequestMapping
-@PrefixMapping("/api/v1")    // Prefix to add when using this annotation
+@PrefixMapping("/api/v1")
 public @interface ApiController {
     /**
      * Alias for {@link RequestMapping#value}.

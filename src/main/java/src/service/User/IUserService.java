@@ -9,7 +9,4 @@ import java.util.UUID;
 
 public interface IUserService extends IService<UserDto, UserCreateDto, UserUpdateDto> {
 
-    public double getDiscountFromUserLevel(UUID id);
-
-    UserDto createUser(UserCreateDto userCreateDTO);
 }

@@ -5,8 +5,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
-import src.model.CourseRegister;
-import src.service.Course.Dto.CourseDto;
 import src.service.CourseRegister.CourseRegisterService;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;

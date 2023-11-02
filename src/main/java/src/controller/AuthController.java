@@ -19,7 +19,7 @@ import src.repository.UserRepository;
 import src.service.User.Dto.UserCreateDto;
 import src.service.User.Dto.UserDto;
 import src.service.User.Dto.UserProfileDto;
-import src.service.User.IUserService;
+
 import src.service.User.auth.*;
 
 import java.util.List;
@@ -28,10 +28,8 @@ import java.util.List;
 @ApiPrefixController("/auth")
 @Tag(name = "User authentication")
 public class AuthController {
-
     @Autowired
     private JwtTokenUtil jwtUtil;
-
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -121,11 +119,5 @@ public class AuthController {
         mailService.sendMessageMail(mail, messageDto);
         return new ResponseEntity<>("Successfully sent the email!", HttpStatus.OK);
     }
-
-
-
-
-
-
 
 }

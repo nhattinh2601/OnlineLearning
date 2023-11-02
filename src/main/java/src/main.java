@@ -12,6 +12,8 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableAsync
 public class main {
+
+
     public static void main(String[] args) {
         SpringApplication.run(main.class, args);
         System.out.println("""
@@ -19,6 +21,9 @@ public class main {
                 """);
         System.out.println("""
                 🚀 Server ready at http://localhost:8080
+                """);
+        System.out.println("""
+                🚀 Server ready at http://localhost:8080/api/v1
                 """);
         System.out.println("""
                 🚀 Api doc ready at http://localhost:8080/swagger-ui/index.html

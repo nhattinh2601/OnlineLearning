@@ -6,12 +6,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
-import src.model.Document;
 import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
 import src.service.Document.Dto.DocumentUpdateDto;
 import src.service.Document.DocumentService;
-import src.service.Video.Dto.VideoDto;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
