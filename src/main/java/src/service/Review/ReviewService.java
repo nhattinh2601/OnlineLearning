@@ -21,6 +21,7 @@ import src.service.Review.Dto.ReviewUpdateDto;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -52,13 +53,10 @@ public class ReviewService {
     }
 
     @Async
-    public CompletableFuture<ReviewDto> create(ReviewCreateDto input) {
+    public CompletableFuture<ReviewDto> create(int userid) {
         Review review = new Review();
-        review.setCourseId(input.getCourseId());
-        review.setUserId(input.getUserId());
-
-        Review savedReview = reviewRepository.save(review);
-        return CompletableFuture.completedFuture(toDto.map(savedReview, ReviewDto.class));
+        review.setUserId(userid);
+        return CompletableFuture.completedFuture(toDto.map(reviewRepository.save(review), ReviewDto.class));
     }
 
     @Async

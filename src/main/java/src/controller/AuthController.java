@@ -7,10 +7,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.auth.JwtTokenUtil;
 import src.config.exception.BadRequestException;
@@ -41,7 +38,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid LoginInputDto loginRequest) throws Exception {
-        final User user = userRepository.findByEmail(loginRequest.getUsername());
+        final User user = userRepository.findByEmail(loginRequest.getEmail());
         if (user == null){
             throw new Exception("Cannot find user with email");
         }
@@ -69,7 +66,7 @@ public class AuthController {
         throw new Exception("Invalid refresh token");
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/register")
     public ResponseEntity<?> signupUser(@RequestBody UserCreateDto userCreateDto) {
         if (isEmailAlreadyTaken(userCreateDto.getEmail())) {
             return new ResponseEntity<>("Email already exists", HttpStatus.BAD_REQUEST);
@@ -105,8 +102,6 @@ public class AuthController {
         return new ResponseEntity<>("Emails sent to all users!", HttpStatus.OK);
     }
 
-
-
     @PostMapping("/send/message/{mail}")
     public ResponseEntity<String> sendMessageMail(@PathVariable String mail, @RequestBody MessageDto messageDto) {
         User user = userRepository.findByEmail(mail);
@@ -119,5 +114,9 @@ public class AuthController {
         mailService.sendMessageMail(mail, messageDto);
         return new ResponseEntity<>("Successfully sent the email!", HttpStatus.OK);
     }
+
+
+
+
 
 }

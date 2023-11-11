@@ -3,12 +3,12 @@ package src.service.User.auth;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LoginInputDto {
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -19,8 +19,8 @@ public class LoginInputDto {
         this.password = password;
     }
 
-    @JsonProperty(value = "username", required = true)
-    String username;
+    @JsonProperty(value = "email", required = true)
+    String email;
     @JsonProperty(value = "password", required = true)
     String password;
 }

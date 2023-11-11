@@ -7,7 +7,8 @@ import java.util.UUID;
 
 @Data
 public class UserProfileDto {
-
+    @JsonProperty(value = "Id", required = true)
+    public int Id;
     @JsonProperty(value = "fullname", required = true)
     private String fullname;
     @JsonProperty(value = "email", required = true)
@@ -20,4 +21,6 @@ public class UserProfileDto {
     private String description;
     @JsonProperty(value = "password", required = true, defaultValue = "0")
     private String password;
+    @JsonProperty(value = "roleId")
+    private int roleId;
 }
