@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.*;
 @Entity
 @Table(name = "course_register")
@@ -16,6 +18,15 @@ public class CourseRegister {
     @Basic
     @Column(name = "isDeleted", nullable = true)
     private Boolean isDeleted;
+    @Basic
+    @Column(name = "otp", nullable = true)
+    private String otp;
+    @Basic
+    @Column(name = "otpGeneratedTime", nullable = true)
+    private LocalDateTime otpGeneratedTime;
+    @Basic
+    @Column(name = "isActive", nullable = true)
+    private Boolean isActive;
     @Basic
     @Column(name = "created_at")
     private Date createAt = new Date(new java.util.Date().getTime());

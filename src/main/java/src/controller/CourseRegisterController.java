@@ -1,7 +1,9 @@
 package src.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
@@ -29,9 +31,23 @@ public class CourseRegisterController {
         return courseRegisterService.getOne(id);
     }
 
-    @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+   /* @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<CourseRegisterDto> create(@RequestBody CourseRegisterCreateDto input) {
         return courseRegisterService.create(input);
+    }*/
+
+    @PostMapping("/register")
+    public ResponseEntity<String> register(@RequestBody CourseRegisterCreateDto courseRegisterCreateDto) {
+        return new ResponseEntity<>(courseRegisterService.register(courseRegisterCreateDto), HttpStatus.OK);
+    }
+    @PutMapping("/verify-account")
+    public ResponseEntity<String> verifyAccount(@RequestParam String email,
+                                                @RequestParam String otp) {
+        return new ResponseEntity<>(courseRegisterService.verifyAccount(email, otp), HttpStatus.OK);
+    }
+    @PutMapping("/regenerate-otp")
+    public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
+        return new ResponseEntity<>(courseRegisterService.regenerateOtp(email), HttpStatus.OK);
     }
 
     @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

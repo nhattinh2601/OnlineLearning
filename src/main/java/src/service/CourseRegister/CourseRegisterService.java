@@ -1,5 +1,6 @@
 package src.service.CourseRegister;
 
+import jakarta.mail.MessagingException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,16 +12,21 @@ import org.springframework.stereotype.Service;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
+import src.config.gmail.EmailUtil;
+import src.config.gmail.OtpUtil;
 import src.config.utils.ApiQuery;
 import src.model.Category;
 import src.model.Course;
 import src.model.CourseRegister;
+import src.model.User;
 import src.repository.CourseRegisterRepository;
 import src.service.Category.Dto.CategoryDto;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;
 import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -33,6 +39,10 @@ public class CourseRegisterService {
     private CourseRegisterRepository courseRegisterRepository;
     @Autowired
     private ModelMapper toDto;
+    @Autowired
+    private OtpUtil otpUtil;
+    @Autowired
+    private EmailUtil emailUtil;
     @PersistenceContext
     EntityManager em;
     @Async
@@ -52,7 +62,7 @@ public class CourseRegisterService {
     }
 
 
-    @Async
+    /*@Async
     public CompletableFuture<CourseRegisterDto> create(CourseRegisterCreateDto input) {
         CourseRegister courseRegister = new CourseRegister();
         courseRegister.setCourseId(input.getCourseId());
@@ -60,7 +70,30 @@ public class CourseRegisterService {
 
         CourseRegister savedCourseRegister = courseRegisterRepository.save(courseRegister);
         return CompletableFuture.completedFuture(toDto.map(savedCourseRegister, CourseRegisterDto.class));
+    }*/
+
+
+    public String register(CourseRegisterCreateDto courseRegisterDto) {
+        try {
+            String otp = otpUtil.generateOtp();
+            emailUtil.sendOtpEmail(courseRegisterDto.getEmail(), otp);
+
+            CourseRegister courseRegister = new CourseRegister();
+            courseRegister.setCourseId(courseRegisterDto.getCourseId());
+            courseRegister.setUserId(courseRegisterDto.getUserId());
+            courseRegister.setOtp(otp);
+            courseRegister.setOtpGeneratedTime(LocalDateTime.now());
+
+            courseRegisterRepository.save(courseRegister);
+
+            return "User registration successful";
+        } catch (Exception e) {
+            // Log the exception or handle it as appropriate for your application
+            e.printStackTrace();
+            return "User registration failed";
+        }
     }
+
 
     @Async
     public CompletableFuture<CourseRegisterDto> update(int id, CourseRegisterUpdateDto courseRegisters) {
@@ -97,5 +130,27 @@ public class CourseRegisterService {
         return CompletableFuture.completedFuture(PagedResultDto.create(pagination,
                 features.filter().orderBy().paginate().exec().stream().map(x -> toDto.map(x, CourseRegisterDto.class)).toList()));
     }
+
+    public String verifyAccount(String email, String otp) {
+        CourseRegister courseRegister = null;
+        if (courseRegister.getOtp().equals(otp) && Duration.between(courseRegister.getOtpGeneratedTime(),
+                LocalDateTime.now()).getSeconds() < (1 * 60)) {
+            courseRegister.setIsActive(true);
+            courseRegisterRepository.save(courseRegister);
+            return "OTP verified you can login";
+        }
+        return "Please regenerate otp and try again";
+    }
+
+    public String regenerateOtp(String email) {
+        CourseRegister courseRegister = null;
+        String otp = otpUtil.generateOtp();
+        emailUtil.sendOtpEmail(email, otp);
+        courseRegister.setOtp(otp);
+        courseRegister.setOtpGeneratedTime(LocalDateTime.now());
+        courseRegisterRepository.save(courseRegister);
+        return "Email sent... please verify account within 1 minute";
+    }
+
 }
 
