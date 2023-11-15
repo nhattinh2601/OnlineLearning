@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
-@ApiPrefixController("images")
+@ApiPrefixController("cloud")
 public class ImageController {
     @Autowired
     private Cloudinary cloudinary;
 
     @Async
-    @PostMapping(value = "/cloud/upload", consumes = "multipart/form-data")
+    @PostMapping(value = "/images/upload", consumes = "multipart/form-data")
     public CompletableFuture<SuccessResponseDto<String>> uploadFileCloud(@RequestPart("file") MultipartFile file) throws IOException {
         // Kiểm tra nếu file là ảnh
         boolean isImage = file.getContentType().startsWith("image/");
@@ -70,7 +70,30 @@ public class ImageController {
     }
 
     @Async
-    @DeleteMapping("/cloud/{publicId}")
+    @PostMapping(value = "/videos/upload", consumes = "multipart/form-data")
+    public CompletableFuture<SuccessResponseDto<String>> uploadVideoCloud(@RequestPart("file") MultipartFile file) throws IOException {
+        // Đọc dữ liệu của file vào một mảng byte
+        byte[] fileData = file.getBytes();
+
+        // Tạo đối tượng Cloudinary
+        Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                "cloud_name", "dqptxftlv",
+                "api_key", "268148952558612",
+                "api_secret", "8gzmcO9n4yChRpHfXAr-8-T6ZXQ"
+        ));
+
+        // Upload video lên Cloudinary
+        Map<String, Object> uploadResult = cloudinary.uploader().upload(fileData, ObjectUtils.asMap(
+                "resource_type", "video"
+        ));
+
+        // Trả về URL của video đã upload
+        String videoUrl = (String) uploadResult.get("url");
+        return CompletableFuture.completedFuture(new SuccessResponseDto<String>(videoUrl));
+    }
+
+    @Async
+    @DeleteMapping("/images/{publicId}")
     public CompletableFuture<SuccessResponseDto<String>> deleteFileCloud(@PathVariable String publicId) {
         try {
             if (publicId == null || publicId.trim() == "")
