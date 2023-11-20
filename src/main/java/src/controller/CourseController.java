@@ -57,4 +57,19 @@ public class CourseController {
         return courseService.calculateCourseRating(courseId);
     }
 
+    @GetMapping("/topNew")
+    public CompletableFuture<List<CourseDto>> getTopNew() {
+        return courseService.getTopNew();
+    }
+
+    @GetMapping("/topMost")
+    public CompletableFuture<List<CourseDto>> getTopMost() {
+        return courseService.getTopMost();
+    }
+
+    @GetMapping("/search/{title}")
+    public CompletableFuture<List<CourseDto>> searchCoursesByTitle(@PathVariable String title) {
+        return courseService.searchByTitle(title);
+    }
+
 }

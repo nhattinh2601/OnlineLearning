@@ -75,6 +75,15 @@ public class CourseRegisterService {
 
     public String register(CourseRegisterCreateDto courseRegisterDto) {
         try {
+            // Check if there is an existing registration for the given userId and courseId
+            Optional<CourseRegister> existingRegistration = courseRegisterRepository.findByUserIdAndCourseId(
+                    courseRegisterDto.getUserId(), courseRegisterDto.getCourseId());
+
+            if (existingRegistration.isPresent()) {
+                return "User is already registered for this course";
+            }
+
+            // If not already registered, generate OTP and proceed with registration
             String otp = otpUtil.generateOtp();
             emailUtil.sendOtpEmail(courseRegisterDto.getEmail(), otp);
 
@@ -151,6 +160,8 @@ public class CourseRegisterService {
         courseRegisterRepository.save(courseRegister);
         return "Email sent... please verify account within 1 minute";
     }
+
+
 
 }
 

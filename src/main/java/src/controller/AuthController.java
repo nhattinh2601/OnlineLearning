@@ -83,6 +83,25 @@ public class AuthController {
         return existingUser != null;
     }
 
+    @PostMapping("/forget-password")
+    public ResponseEntity<?> forgetPassword(@RequestBody @Valid ForgetPasswordDto forgetPasswordDto) {
+
+        User user = userRepository.findByEmail(forgetPasswordDto.getEmail());
+        if (user == null) {
+            throw new BadRequestException("Email not found");
+        }
+
+        if (!forgetPasswordDto.getNewPassword().equals(forgetPasswordDto.getRePassword())) {
+            throw new BadRequestException("Password and rePassword do not match");
+        }
+
+        user.setPassword(JwtTokenUtil.hashPassword(forgetPasswordDto.getNewPassword())); // Thực hiện mã hóa mật khẩu
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password reset successfully");
+    }
+
     @PostMapping("/send/message/all-users")
     public ResponseEntity<String> sendEmailToAllUsers(@RequestBody MessageDto messageDto) {
         List<User> users = userRepository.findAll(); // Lấy danh sách tất cả người dùng
@@ -91,11 +110,10 @@ public class AuthController {
             String email = user.getEmail();
 
             try {
-                // Gửi email đến địa chỉ email của người dùng
+
                 mailService.sendMessageMail(email, messageDto);
             } catch (Exception e) {
-                // Xử lý lỗi khi gửi email
-                // Bạn có thể ghi log lỗi hoặc thực hiện các xử lý cụ thể khác
+
             }
         }
 
@@ -110,11 +128,45 @@ public class AuthController {
             return new ResponseEntity<>("Email not found in the database", HttpStatus.BAD_REQUEST);
         }
 
-        // Gửi email vì email và số điện thoại đều khớp
+
         mailService.sendMessageMail(mail, messageDto);
         return new ResponseEntity<>("Successfully sent the email!", HttpStatus.OK);
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDto changePasswordDto) {
+
+        User user = userRepository.findByEmail(changePasswordDto.getEmail());
+        if (user == null) {
+            throw new BadRequestException("Email not found");
+        }
+
+        // Kiểm tra xem userId từ DTO có khớp với userId của user không
+        if (changePasswordDto.getUserId() != user.getId()) {
+            throw new BadRequestException("Invalid user ID");
+        }
+
+        // Kiểm tra xem mật khẩu cũ có đúng không
+        if (!JwtTokenUtil.comparePassword(changePasswordDto.getOldPassword(), user.getPassword())) {
+            throw new BadRequestException("Incorrect old password");
+        }
+
+        // Kiểm tra xem mật khẩu mới có giống mật khẩu cũ không
+        if (changePasswordDto.getNewPassword().equals(changePasswordDto.getOldPassword())) {
+            throw new BadRequestException("New password must be different from the old password");
+        }
+
+        if (!changePasswordDto.getNewPassword().equals(changePasswordDto.getRePassword())) {
+            throw new BadRequestException("New password and re-entered password must match");
+        }
+
+        // Cập nhật mật khẩu mới cho user
+        user.setPassword(JwtTokenUtil.hashPassword(changePasswordDto.getNewPassword()));
+
+        userRepository.save(user);
+
+        return ResponseEntity.ok("Password changed successfully");
+    }
 
 
 

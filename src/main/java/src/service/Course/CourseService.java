@@ -17,6 +17,7 @@ import src.config.utils.ApiQuery;
 import src.model.Category;
 import src.model.Course;
 import src.model.Rating;
+import src.repository.CourseRegisterRepository;
 import src.repository.CourseRepository;
 import src.repository.RatingRepository;
 import src.service.Category.Dto.CategoryDto;
@@ -24,9 +25,7 @@ import src.service.Course.Dto.CourseCreateDto;
 import src.service.Course.Dto.CourseDto;
 import src.service.Course.Dto.CourseUpdateDto;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -34,6 +33,9 @@ import java.util.stream.Collectors;
 public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private CourseRegisterRepository courseRegisterRepository;
     @Autowired
     private RatingRepository ratingRepository;
 
@@ -61,6 +63,7 @@ public class CourseService {
     @Async
     public CompletableFuture<CourseDto> create(CourseCreateDto input) {
         Course course = new Course();
+        course.setTitle(input.getTitle());
         course.setPrice(input.getPrice());
         course.setPromotional_price(input.getPromotional_price());
         course.setSold(input.getSold());
@@ -115,7 +118,7 @@ public class CourseService {
     public double calculateCourseRating(int courseId) {
         Course course = courseRepository.findById(courseId).orElse(null);
         if (course == null) {
-            return -1; // Hoặc sử dụng mã lỗi khác tùy theo yêu cầu của bạn
+            return -1;
         }
 
         Iterable<Rating> ratings = ratingRepository.findByCourseId(courseId);
@@ -136,5 +139,53 @@ public class CourseService {
 
         return averageRating;
     }
+
+    @Async
+    public CompletableFuture<List<CourseDto>> getTopNew() {
+        List<Course> newestCourses = courseRepository.findAll()
+                .stream()
+                .filter(course -> course.getActive() || !course.getIsDeleted())
+                .sorted(Comparator.comparing(Course::getCreateAt).reversed())
+                .limit(4)
+                .collect(Collectors.toList());
+
+        return CompletableFuture.completedFuture(newestCourses.stream()
+                .map(course -> toDto.map(course, CourseDto.class))
+                .collect(Collectors.toList()));
+    }
+
+    @Async
+    public CompletableFuture<List<CourseDto>> getTopMost() {
+        List<Course> courses = courseRepository.findAll();
+
+        Map<Course, Long> registrationsCountMap = courses.stream()
+                .filter(course -> course.getActive() || !course.getIsDeleted())
+                .collect(Collectors.toMap(
+                        course -> course,
+                        course -> courseRegisterRepository.countByCourseIdAndIsActive(course.getId(), true)
+                ));
+
+        // Sort courses by registration count in descending order and get top 4
+        List<Course> top4Courses = registrationsCountMap.entrySet().stream()
+                .sorted(Map.Entry.<Course, Long>comparingByValue().reversed())
+                .limit(4)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        return CompletableFuture.completedFuture(top4Courses.stream()
+                .map(course -> toDto.map(course, CourseDto.class))
+                .collect(Collectors.toList()));
+    }
+
+    @Async
+    public CompletableFuture<List<CourseDto>> searchByTitle(String title) {
+        List<Course> foundCourses = courseRepository.searchByTitle(title);
+
+        return CompletableFuture.completedFuture(foundCourses.stream()
+                .map(course -> toDto.map(course, CourseDto.class))
+                .collect(Collectors.toList()));
+    }
+
+
 
 }

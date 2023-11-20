@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -122,9 +123,10 @@ public class UserService {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser == null)
             throw new ResponseStatusException(NOT_FOUND, "Không tìm thấy người dùng này");
-        return CompletableFuture.completedFuture(toDto.map(userRepository.save(toDto.map(user, User.class)), UserDto.class));
+        BeanUtils.copyProperties(user, existingUser);
+        return CompletableFuture.completedFuture(toDto.map(userRepository.save(existingUser), UserDto.class));
     }
-
+    
     @Async
     public CompletableFuture<PagedResultDto<UserDto>> findAllPagination(HttpServletRequest request, Integer limit, Integer skip) {
         long total = userRepository.count();
