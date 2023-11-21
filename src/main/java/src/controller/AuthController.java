@@ -141,17 +141,14 @@ public class AuthController {
             throw new BadRequestException("Email not found");
         }
 
-        // Kiểm tra xem userId từ DTO có khớp với userId của user không
         if (changePasswordDto.getUserId() != user.getId()) {
             throw new BadRequestException("Invalid user ID");
         }
 
-        // Kiểm tra xem mật khẩu cũ có đúng không
         if (!JwtTokenUtil.comparePassword(changePasswordDto.getOldPassword(), user.getPassword())) {
             throw new BadRequestException("Incorrect old password");
         }
 
-        // Kiểm tra xem mật khẩu mới có giống mật khẩu cũ không
         if (changePasswordDto.getNewPassword().equals(changePasswordDto.getOldPassword())) {
             throw new BadRequestException("New password must be different from the old password");
         }
@@ -160,7 +157,6 @@ public class AuthController {
             throw new BadRequestException("New password and re-entered password must match");
         }
 
-        // Cập nhật mật khẩu mới cho user
         user.setPassword(JwtTokenUtil.hashPassword(changePasswordDto.getNewPassword()));
 
         userRepository.save(user);

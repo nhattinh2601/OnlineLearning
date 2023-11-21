@@ -72,4 +72,9 @@ public class CourseController {
         return courseService.searchByTitle(title);
     }
 
+    @GetMapping("/searchCategory/{categoryId}")
+    public CompletableFuture<List<CourseDto>> getCoursesByCategoryId(@PathVariable int categoryId) {
+        return courseService.getCoursesByCategoryId(categoryId);
+    }
+
 }

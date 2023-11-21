@@ -13,4 +13,6 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query("SELECT c FROM Course c WHERE LOWER(c.title) LIKE LOWER(CONCAT('%', :title, '%')) AND (c.active = true OR c.isDeleted = false)")
     List<Course> searchByTitle(@Param("title") String title);
 
+    List<Course> findByCategoryId(int categoryId);
+
 }

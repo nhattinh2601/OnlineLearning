@@ -186,6 +186,12 @@ public class CourseService {
                 .collect(Collectors.toList()));
     }
 
+    public CompletableFuture<List<CourseDto>> getCoursesByCategoryId(int categoryId) {
+        List<Course> foundCourses = courseRepository.findByCategoryId(categoryId);
+        return CompletableFuture.completedFuture(foundCourses.stream()
+                .map(course -> toDto.map(course, CourseDto.class))
+                .collect(Collectors.toList()));
 
+    }
 
 }
