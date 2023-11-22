@@ -202,7 +202,7 @@ public class UserService {
                 user.setAccount_name((String) value);
                 break;
             case "password":
-                user.setPassword((String) value);
+                user.setPassword(JwtTokenUtil.hashPassword((String) value));
                 break;
             case "roleId":
                 user.setRoleId((int) value);
