@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
 import src.model.Video;
+import src.model.Video;
 import src.service.Video.VideoService;
 import src.service.Video.Dto.VideoCreateDto;
 import src.service.Video.Dto.VideoDto;
@@ -18,6 +19,7 @@ import src.service.Video.Dto.VideoUpdateDto;
 
 import java.util.List;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -51,9 +53,23 @@ public class VideoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(future);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<VideoDto> update(@PathVariable int id, VideoUpdateDto video) {
         return videoService.update(id, video);
+    }*/
+
+    @PatchMapping("/{videoId}")
+    public ResponseEntity<Video> updateVideoField(
+            @PathVariable int videoId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Video updatedVideo = videoService.updateVideo(videoId, fieldsToUpdate);
+
+        if (updatedVideo != null) {
+            return ResponseEntity.ok(updatedVideo);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

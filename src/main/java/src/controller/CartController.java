@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -11,6 +12,7 @@ import src.config.annotation.ApiPrefixController;
 import src.config.annotation.Authenticate;
 import src.config.dto.PagedResultDto;
 
+import src.model.Cart;
 import src.service.Cart.CartService;
 import src.service.Cart.Dto.CartDto;
 import src.service.Cart.Dto.CartUpdateDto;
@@ -18,6 +20,7 @@ import src.service.Cart.Dto.CartUpdateDto;
 
 import java.util.List;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -51,10 +54,23 @@ public class CartController {
         return cartService.create(userId);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+   /* @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<CartDto> update(@PathVariable int id, CartUpdateDto cart) {
         return cartService.update(id, cart);
-    }
+    }*/
+   @PatchMapping("/{cartId}")
+   public ResponseEntity<Cart> updateCartField(
+           @PathVariable int cartId,
+           @RequestBody Map<String, Object> fieldsToUpdate) {
+
+       Cart updatedCart = cartService.updateCart(cartId, fieldsToUpdate);
+
+       if (updatedCart != null) {
+           return ResponseEntity.ok(updatedCart);
+       } else {
+           return ResponseEntity.notFound().build();
+       }
+   }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<String> deleteById(@PathVariable int id) {

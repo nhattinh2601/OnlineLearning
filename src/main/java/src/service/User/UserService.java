@@ -8,47 +8,31 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.server.ResponseStatusException;
 import src.config.auth.JwtTokenUtil;
 import src.config.dto.PagedResultDto;
 
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
-import src.model.Cart;
-import src.model.Rating;
-import src.model.Role;
 import src.model.User;
 import src.repository.CartRepository;
 import src.repository.RoleRepository;
 import src.repository.UserRepository;
-import src.service.Rating.Dto.RatingDto;
-import src.service.Role.Dto.RoleCreateDto;
-import src.service.Role.Dto.RoleDto;
 import src.service.User.Dto.UserCreateDto;
 import src.service.User.Dto.UserDto;
-import src.service.User.Dto.UserUpdateDto;
-import src.service.User.IUserService;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -118,14 +102,14 @@ public class UserService {
     }*/
 
 
-    @Async
+   /* @Async
     public CompletableFuture<UserDto> update(int id, UserUpdateDto user) {
         User existingUser = userRepository.findById(id).orElse(null);
         if (existingUser == null)
             throw new ResponseStatusException(NOT_FOUND, "Không tìm thấy người dùng này");
         BeanUtils.copyProperties(user, existingUser);
         return CompletableFuture.completedFuture(toDto.map(userRepository.save(existingUser), UserDto.class));
-    }
+    }*/
     
     @Async
     public CompletableFuture<PagedResultDto<UserDto>> findAllPagination(HttpServletRequest request, Integer limit, Integer skip) {
@@ -167,6 +151,68 @@ public class UserService {
             return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
         }
     }
+
+
+    public User updateUser(int userId, Map<String, Object> fieldsToUpdate) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            updateUserFields(user, fieldsToUpdate);
+            user.setUpdateAt(new Date());
+            userRepository.save(user);
+            return user;
+        }
+
+        return null;
+    }
+
+    private void updateUserFields(User user, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateUserField(user, fieldName, value);
+        }
+    }
+
+    private void updateUserField(User user, String fieldName, Object value) {
+        switch (fieldName) {
+            case "fullname":
+                user.setFullname((String) value);
+                break;
+            case "email":
+                user.setEmail((String) value);
+                break;
+            case "phone":
+                user.setPhone((String) value);
+                break;
+            case "avatar":
+                user.setAvatar((String) value);
+                break;
+            case "description":
+                user.setDescription((String) value);
+                break;
+            case "bank_name":
+                user.setBank_name((String) value);
+                break;
+            case "account_number":
+                user.setAccount_number((String) value);
+                break;
+            case "account_name":
+                user.setAccount_name((String) value);
+                break;
+            case "password":
+                user.setPassword((String) value);
+                break;
+            case "roleId":
+                user.setRoleId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
 
 
 

@@ -17,6 +17,7 @@ import src.config.utils.ApiQuery;
 import src.model.Category;
 import src.model.Course;
 import src.model.Rating;
+import src.model.User;
 import src.repository.CourseRegisterRepository;
 import src.repository.CourseRepository;
 import src.repository.RatingRepository;
@@ -78,13 +79,73 @@ public class CourseService {
         return CompletableFuture.completedFuture(toDto.map(savedCourse, CourseDto.class));
     }
 
-    @Async
+   /* @Async
     public CompletableFuture<CourseDto> update(int id, CourseUpdateDto courses) {
         Course existingCourse = courseRepository.findById(id).orElse(null);
         if (existingCourse == null)
             throw new NotFoundException("Unable to find course!");
         BeanUtils.copyProperties(courses, existingCourse);
         return CompletableFuture.completedFuture(toDto.map(courseRepository.save(existingCourse), CourseDto.class));
+    }*/
+
+    public Course updateCourse(int courseId, Map<String, Object> fieldsToUpdate) {
+        Optional<Course> optionalCourse = courseRepository.findById(courseId);
+
+        if (optionalCourse.isPresent()) {
+            Course course = optionalCourse.get();
+            updateCourseFields(course, fieldsToUpdate);
+            course.setUpdateAt(new Date());
+            courseRepository.save(course);
+            return course;
+        }
+
+        return null;
+    }
+
+    private void updateCourseFields(Course course, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCourseField(course, fieldName, value);
+        }
+    }
+
+    private void updateCourseField(Course course, String fieldName, Object value) {
+        switch (fieldName) {
+            case "title":
+                course.setTitle((String) value);
+                break;
+            case "price":
+                course.setPrice((double) value);
+                break;
+            case "promotional_price":
+                course.setPromotional_price((double) value);
+                break;
+            case "sold":
+                course.setSold((double) value);
+                break;
+            case "description":
+                course.setDescription((String) value);
+                break;
+            case "active":
+                course.setActive((Boolean) value);
+                break;
+            case "rating":
+                course.setRating((int) value);
+                break;
+            case "image":
+                course.setImage((String) value);
+                break;
+            case "categoryId":
+                course.setCategoryId((int) value);
+                break;
+            case "userId":
+                course.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Async
@@ -164,8 +225,6 @@ public class CourseService {
                         course -> course,
                         course -> courseRegisterRepository.countByCourseIdAndIsActive(course.getId(), true)
                 ));
-
-        // Sort courses by registration count in descending order and get top 4
         List<Course> top4Courses = registrationsCountMap.entrySet().stream()
                 .sorted(Map.Entry.<Course, Long>comparingByValue().reversed())
                 .limit(4)
@@ -193,5 +252,6 @@ public class CourseService {
                 .collect(Collectors.toList()));
 
     }
+    
 
 }

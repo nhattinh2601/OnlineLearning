@@ -11,6 +11,7 @@ import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
 
 import src.model.Category;
+import src.model.Category;
 import src.service.Category.CategoryService;
 import src.service.Category.Dto.CategoryCreateDto;
 import src.service.Category.Dto.CategoryDto;
@@ -18,6 +19,7 @@ import src.service.Category.Dto.CategoryUpdateDto;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -49,9 +51,22 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(future);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<CategoryDto> update(@PathVariable int id, CategoryUpdateDto category) {
         return categoryService.update(id, category);
+    }*/
+    @PatchMapping("/{categoryId}")
+    public ResponseEntity<Category> updateCategoryField(
+            @PathVariable int categoryId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Category updatedCategory = categoryService.updateCategory(categoryId, fieldsToUpdate);
+
+        if (updatedCategory != null) {
+            return ResponseEntity.ok(updatedCategory);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

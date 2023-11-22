@@ -15,16 +15,17 @@ import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Course;
 import src.model.Document;
+import src.model.Document;
 import src.model.Video;
 import src.repository.DocumentRepository;
-import src.service.Course.Dto.CourseDto;
+
 import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
-import src.service.Document.Dto.DocumentUpdateDto;
-import src.service.Video.Dto.VideoDto;
+
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -65,14 +66,14 @@ public class DocumentService {
         return CompletableFuture.completedFuture(toDto.map(savedDocument, DocumentDto.class));
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<DocumentDto> update(int id, DocumentUpdateDto documents) {
         Document existingDocument = documentRepository.findById(id).orElse(null);
         if (existingDocument == null)
             throw new NotFoundException("Unable to find document!");
         BeanUtils.copyProperties(documents, existingDocument);
         return CompletableFuture.completedFuture(toDto.map(documentRepository.save(existingDocument), DocumentDto.class));
-    }
+    }*/
 
     @Async
     public CompletableFuture<String> deleteById(int id) {
@@ -99,5 +100,49 @@ public class DocumentService {
         return CompletableFuture.completedFuture(PagedResultDto.create(pagination,
                 features.filter().orderBy().paginate().exec().stream().map(x -> toDto.map(x, DocumentDto.class)).toList()));
     }
+
+    public Document updateDocument(int documentId, Map<String, Object> fieldsToUpdate) {
+        Optional<Document> optionalDocument = documentRepository.findById(documentId);
+
+        if (optionalDocument.isPresent()) {
+            Document document = optionalDocument.get();
+            updateDocumentFields(document, fieldsToUpdate);
+            document.setUpdateAt(new Date());
+            documentRepository.save(document);
+            return document;
+        }
+
+        return null;
+    }
+
+    private void updateDocumentFields(Document document, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateDocumentField(document, fieldName, value);
+        }
+    }
+
+    private void updateDocumentField(Document document, String fieldName, Object value) {
+        switch (fieldName) {
+            case "file_path":
+                document.setFile_path((String) value);
+                break;
+            case "title":
+                document.setTitle((String) value);
+                break;
+            case "image":
+                document.setImage((String) value);
+                break;
+
+            case "courseId":
+                document.setCourseId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
 
 }

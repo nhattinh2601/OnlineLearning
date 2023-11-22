@@ -14,10 +14,11 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Category;
+
 import src.repository.CategoryRepository;
 import src.service.Category.Dto.CategoryCreateDto;
 import src.service.Category.Dto.CategoryDto;
-import src.service.Category.Dto.CategoryUpdateDto;
+
 
 
 import java.util.*;
@@ -70,7 +71,7 @@ public class CategoryService {
         return future;
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<CategoryDto> update(int id, CategoryUpdateDto categorys) {
         Category existingCategory = categoryRepository.findById(id).orElse(null);
         if (existingCategory == null)
@@ -78,6 +79,44 @@ public class CategoryService {
         BeanUtils.copyProperties(categorys, existingCategory);
         existingCategory.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(categoryRepository.save(existingCategory), CategoryDto.class));
+    }*/
+    public Category updateCategory(int categoryId, Map<String, Object> fieldsToUpdate) {
+        Optional<Category> optionalCategory = categoryRepository.findById(categoryId);
+
+        if (optionalCategory.isPresent()) {
+            Category category = optionalCategory.get();
+            updateCategoryFields(category, fieldsToUpdate);
+            category.setUpdateAt(new Date());
+            categoryRepository.save(category);
+            return category;
+        }
+
+        return null;
+    }
+
+    private void updateCategoryFields(Category category, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCategoryField(category, fieldName, value);
+        }
+    }
+
+    private void updateCategoryField(Category category, String fieldName, Object value) {
+        switch (fieldName) {
+            case "name":
+                category.setName((String) value);
+                break;
+            case "image":
+                category.setImage((String) value);
+                break;
+            case "parentCategoryId":
+                category.setParentCategoryId((int) value);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Async
@@ -115,7 +154,7 @@ public class CategoryService {
 
         List<Category> categories = categoryRepository.findAllByParentCategoryId(parentCategoryId);
         if (categories == null) {
-            throw new NotFoundException("Unable to find categories with parent category ID " + parentCategoryId);
+            throw new NotFoundException("Unable to find categories with parent category ID: " + parentCategoryId);
         }
         return CompletableFuture.completedFuture(categories.stream().map(
                 x -> toDto.map(x, CategoryDto.class)

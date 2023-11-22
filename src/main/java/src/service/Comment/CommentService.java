@@ -13,6 +13,7 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Comment;
+import src.model.User;
 import src.repository.CommentRepository;
 import src.service.Comment.Dto.CommentCreateDto;
 import src.service.Comment.Dto.CommentDto;
@@ -20,6 +21,7 @@ import src.service.Comment.Dto.CommentUpdateDto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -70,7 +72,7 @@ public class CommentService {
         return future;
     }
 
-    @Async
+   /* @Async
     public CompletableFuture<CommentDto> update(int id, CommentUpdateDto comments) {
         Comment existingComment = commentRepository.findById(id).orElse(null);
         if (existingComment == null)
@@ -78,6 +80,47 @@ public class CommentService {
         BeanUtils.copyProperties(comments, existingComment);
         existingComment.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(commentRepository.save(existingComment), CommentDto.class));
+    }*/
+   public Comment updateComment(int commentId, Map<String, Object> fieldsToUpdate) {
+       Optional<Comment> optionalComment = commentRepository.findById(commentId);
+
+       if (optionalComment.isPresent()) {
+           Comment comment = optionalComment.get();
+           updateCommentFields(comment, fieldsToUpdate);
+           comment.setUpdateAt(new Date());
+           commentRepository.save(comment);
+           return comment;
+       }
+
+       return null;
+   }
+
+    private void updateCommentFields(Comment comment, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCommentField(comment, fieldName, value);
+        }
+    }
+
+    private void updateCommentField(Comment comment, String fieldName, Object value) {
+        switch (fieldName) {
+            case "cotent":
+                comment.setContent((String) value);
+                break;
+            case "videoId":
+                comment.setVideoId((int) value);
+                break;
+            case "userId":
+                comment.setUserId((int) value);
+                break;
+            case "parentCommentId":
+                comment.setParentCommentId((int) value);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Async

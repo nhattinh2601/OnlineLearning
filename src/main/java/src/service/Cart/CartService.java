@@ -13,12 +13,14 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Cart;
+import src.model.Cart;
 import src.repository.CartRepository;
 import src.service.Cart.Dto.CartDto;
 import src.service.Cart.Dto.CartUpdateDto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -56,7 +58,7 @@ public class CartService {
         return CompletableFuture.completedFuture(toDto.map(cartRepository.save(cart), CartDto.class));
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<CartDto> update(int id, CartUpdateDto carts) {
         Cart existingCart = cartRepository.findById(id).orElse(null);
         if (existingCart == null)
@@ -64,6 +66,41 @@ public class CartService {
         BeanUtils.copyProperties(carts, existingCart);
         existingCart.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(cartRepository.save(existingCart), CartDto.class));
+    }*/
+    public Cart updateCart(int cartId, Map<String, Object> fieldsToUpdate) {
+        Optional<Cart> optionalCart = cartRepository.findById(cartId);
+
+        if (optionalCart.isPresent()) {
+            Cart cart = optionalCart.get();
+            updateCartFields(cart, fieldsToUpdate);
+            cart.setUpdateAt(new Date());
+            cartRepository.save(cart);
+            return cart;
+        }
+
+        return null;
+    }
+
+    private void updateCartFields(Cart cart, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCartField(cart, fieldName, value);
+        }
+    }
+
+    private void updateCartField(Cart cart, String fieldName, Object value) {
+        switch (fieldName) {
+            case "courseId":
+                cart.setCourseId((int) value);
+                break;
+            case "userId":
+                cart.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Async

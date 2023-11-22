@@ -31,38 +31,37 @@ public class ImageController {
     @Async
     @PostMapping(value = "/images/upload", consumes = "multipart/form-data")
     public CompletableFuture<SuccessResponseDto<String>> uploadFileCloud(@RequestPart("file") MultipartFile file) throws IOException {
-        // Kiểm tra nếu file là ảnh
+
         boolean isImage = file.getContentType().startsWith("image/");
         if (isImage) {
-            // Đọc dữ liệu của file vào một mảng byte
+
             byte[] fileData = file.getBytes();
-            // Tạo một đối tượng BufferedImage từ dữ liệu của file
+
             BufferedImage originalImage = ImageIO.read(new ByteArrayInputStream(fileData));
-            // Thiết lập kích thước mới cho ảnh (full HD)
+
             int newWidth = 1920;
             int newHeight = 1080;
-            // Kiểm tra kích thước của ảnh
+
             boolean isLargeImage = originalImage != null && originalImage.getWidth() > newWidth && originalImage.getHeight() > newHeight;
-            // Nếu ảnh lớn hơn kích thước cho phép, resize ảnh
+
             if (isLargeImage) {
-                // Tạo một đối tượng BufferedImage mới với kích thước mới và vẽ ảnh gốc lên đó
+
                 BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, originalImage.getType());
                 Graphics2D g2d = resizedImage.createGraphics();
                 g2d.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
                 g2d.dispose();
 
-                // Chuyển đổi ảnh mới thành mảng byte
                 ByteArrayOutputStream newImageBytes = new ByteArrayOutputStream();
                 ImageIO.write(resizedImage, "jpg", newImageBytes);
                 fileData = newImageBytes.toByteArray();
             }
-            // Upload file lên Cloudinary
+
             Map uploadResult = cloudinary.uploader().upload(fileData, ObjectUtils.emptyMap());
-            // Trả về URL của file đã upload
+
             String fileUrl = (String) uploadResult.get("url");
             return CompletableFuture.completedFuture(new SuccessResponseDto<String>(fileUrl));
         } else {
-            // Trường hợp file không phải là ảnh, upload file thẳng lên Cloudinary
+
             Map<String, Object> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
             String fileUrl = ((String) uploadResult.get("url")).replace("http", "https");
             return CompletableFuture.completedFuture(new SuccessResponseDto<String>(fileUrl));
@@ -72,10 +71,9 @@ public class ImageController {
     @Async
     @PostMapping(value = "/videos/upload", consumes = "multipart/form-data")
     public CompletableFuture<SuccessResponseDto<String>> uploadVideoCloud(@RequestPart("file") MultipartFile file) throws IOException {
-        // Đọc dữ liệu của file vào một mảng byte
+
         byte[] fileData = file.getBytes();
 
-        // Tạo đối tượng Cloudinary
         Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
                 "cloud_name", "dqptxftlv",
                 "api_key", "268148952558612",
@@ -87,7 +85,6 @@ public class ImageController {
                 "resource_type", "video"
         ));
 
-        // Trả về URL của video đã upload
         String videoUrl = (String) uploadResult.get("url");
         return CompletableFuture.completedFuture(new SuccessResponseDto<String>(videoUrl));
     }

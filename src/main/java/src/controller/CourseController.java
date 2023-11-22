@@ -3,9 +3,11 @@ package src.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
+import src.model.Course;
 import src.service.Category.Dto.CategoryDto;
 import src.service.Course.Dto.CourseCreateDto;
 import src.service.Course.Dto.CourseDto;
@@ -13,6 +15,7 @@ import src.service.Course.Dto.CourseUpdateDto;
 import src.service.Course.CourseService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -36,9 +39,22 @@ public class CourseController {
         return courseService.create(input);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<CourseDto> update(@PathVariable int id, CourseUpdateDto course) {
         return courseService.update(id, course);
+    }*/
+    @PatchMapping("/{courseId}")
+    public ResponseEntity<Course> updateCourseField(
+            @PathVariable int courseId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Course updatedCourse = courseService.updateCourse(courseId, fieldsToUpdate);
+
+        if (updatedCourse != null) {
+            return ResponseEntity.ok(updatedCourse);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

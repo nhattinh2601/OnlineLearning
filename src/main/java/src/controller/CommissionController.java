@@ -20,7 +20,6 @@ public class CommissionController {
     @Autowired
     private CommissionService commissionService;
 
-
     @GetMapping( "/{id}")
     public CompletableFuture<CommissionDto> findOneById(@PathVariable int id) {
         return commissionService.getOne(id);

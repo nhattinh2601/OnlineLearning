@@ -3,15 +3,19 @@ package src.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
+import src.model.Rating;
+import src.model.User;
 import src.service.Rating.Dto.RatingCreateDto;
 import src.service.Rating.Dto.RatingDto;
 import src.service.Rating.Dto.RatingUpdateDto;
 import src.service.Rating.RatingService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -42,9 +46,22 @@ public class RatingController {
         return ratingService.create(input);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<RatingDto> update(@PathVariable int id, RatingUpdateDto rating) {
         return ratingService.update(id, rating);
+    }*/
+    @PatchMapping("/{userId}")
+    public ResponseEntity<Rating> updateRatingField(
+            @PathVariable int userId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Rating updatedRating = ratingService.updateRating(userId, fieldsToUpdate);
+
+        if (updatedRating != null) {
+            return ResponseEntity.ok(updatedRating);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

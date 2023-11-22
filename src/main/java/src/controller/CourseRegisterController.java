@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
+import src.model.CourseRegister;
 import src.service.CourseRegister.CourseRegisterService;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;
 import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -50,9 +52,23 @@ public class CourseRegisterController {
         return new ResponseEntity<>(courseRegisterService.regenerateOtp(email), HttpStatus.OK);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<CourseRegisterDto> update(@PathVariable int id, CourseRegisterUpdateDto courseRegister) {
         return courseRegisterService.update(id, courseRegister);
+    }*/
+
+    @PatchMapping("/{courseRegisterId}")
+    public ResponseEntity<CourseRegister> updateCourseRegisterField(
+            @PathVariable int courseRegisterId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        CourseRegister updatedCourseRegister = courseRegisterService.updateCourseRegister(courseRegisterId, fieldsToUpdate);
+
+        if (updatedCourseRegister != null) {
+            return ResponseEntity.ok(updatedCourseRegister);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

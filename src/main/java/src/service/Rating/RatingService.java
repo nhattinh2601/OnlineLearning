@@ -13,6 +13,7 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Rating;
+import src.model.Rating;
 import src.repository.RatingRepository;
 import src.service.Rating.Dto.RatingCreateDto;
 import src.service.Rating.Dto.RatingDto;
@@ -20,6 +21,7 @@ import src.service.Rating.Dto.RatingUpdateDto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -96,6 +98,45 @@ public class RatingService {
             return CompletableFuture.completedFuture("Đánh dấu xóa thành công");
         } catch (Exception e) {
             return CompletableFuture.completedFuture("Xóa không được");
+        }
+    }
+
+    public Rating updateRating(int ratingId, Map<String, Object> fieldsToUpdate) {
+        Optional<Rating> optionalRating = ratingRepository.findById(ratingId);
+
+        if (optionalRating.isPresent()) {
+            Rating rating = optionalRating.get();
+            updateRatingFields(rating, fieldsToUpdate);
+            rating.setUpdateAt(new Date());
+            ratingRepository.save(rating);
+            return rating;
+        }
+
+        return null;
+    }
+
+    private void updateRatingFields(Rating rating, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateRatingField(rating, fieldName, value);
+        }
+    }
+
+    private void updateRatingField(Rating rating, String fieldName, Object value) {
+        switch (fieldName) {
+            case "rating":
+                rating.setRating((int) value);
+                break;
+            case "courseId":
+                rating.setCourseId((int) value);
+                break;
+            case "userId":
+                rating.setUserId((int) value);
+                break;
+
+            default:
+                break;
         }
     }
 }

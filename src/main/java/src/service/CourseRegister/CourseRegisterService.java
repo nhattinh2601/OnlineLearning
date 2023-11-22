@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -75,7 +76,7 @@ public class CourseRegisterService {
 
     public String register(CourseRegisterCreateDto courseRegisterDto) {
         try {
-            // Check if there is an existing registration for the given userId and courseId
+            // Check if there is an existing registration for the given courseRegisterId and courseId
             Optional<CourseRegister> existingRegistration = courseRegisterRepository.findByUserIdAndCourseId(
                     courseRegisterDto.getUserId(), courseRegisterDto.getCourseId());
 
@@ -104,14 +105,54 @@ public class CourseRegisterService {
     }
 
 
-    @Async
+    /*@Async
     public CompletableFuture<CourseRegisterDto> update(int id, CourseRegisterUpdateDto courseRegisters) {
         CourseRegister existingCourseRegister = courseRegisterRepository.findById(id).orElse(null);
         if (existingCourseRegister == null)
             throw new NotFoundException("Unable to find course!");
         BeanUtils.copyProperties(courseRegisters, existingCourseRegister);
         return CompletableFuture.completedFuture(toDto.map(courseRegisterRepository.save(existingCourseRegister), CourseRegisterDto.class));
+    }*/
+
+    public CourseRegister updateCourseRegister(int courseRegisterId, Map<String, Object> fieldsToUpdate) {
+        Optional<CourseRegister> optionalCourseRegister = courseRegisterRepository.findById(courseRegisterId);
+
+        if (optionalCourseRegister.isPresent()) {
+            CourseRegister courseRegister = optionalCourseRegister.get();
+            updateCourseRegisterFields(courseRegister, fieldsToUpdate);
+            courseRegister.setUpdateAt(new Date());
+            courseRegisterRepository.save(courseRegister);
+            return courseRegister;
+        }
+
+        return null;
     }
+
+    private void updateCourseRegisterFields(CourseRegister courseRegister, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCourseRegisterField(courseRegister, fieldName, value);
+        }
+    }
+
+    private void updateCourseRegisterField(CourseRegister courseRegister, String fieldName, Object value) {
+        switch (fieldName) {
+            case "otp":
+                courseRegister.setOtp((String) value);
+                break;
+            case "courseId":
+                courseRegister.setCourseId((int) value);
+                break;
+            case "userId":
+                courseRegister.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
 
     @Async
     public CompletableFuture<String> deleteById(int id) {
