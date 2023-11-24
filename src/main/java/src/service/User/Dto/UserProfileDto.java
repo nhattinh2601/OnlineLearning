@@ -23,4 +23,6 @@ public class UserProfileDto {
     private String password;
     @JsonProperty(value = "roleId")
     private int roleId;
+    @JsonProperty(value = "isDeleted")
+    public Boolean isDeleted;
 }

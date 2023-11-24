@@ -25,6 +25,7 @@ import src.service.Category.Dto.CategoryDto;
 import src.service.Course.Dto.CourseCreateDto;
 import src.service.Course.Dto.CourseDto;
 import src.service.Course.Dto.CourseUpdateDto;
+import src.service.Course.Dto.CourseDto;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -207,7 +208,7 @@ public class CourseService {
                 .stream()
                 .filter(course -> course.getActive() || !course.getIsDeleted())
                 .sorted(Comparator.comparing(Course::getCreateAt).reversed())
-                .limit(4)
+                .limit(6)
                 .collect(Collectors.toList());
 
         return CompletableFuture.completedFuture(newestCourses.stream()
@@ -227,7 +228,7 @@ public class CourseService {
                 ));
         List<Course> top4Courses = registrationsCountMap.entrySet().stream()
                 .sorted(Map.Entry.<Course, Long>comparingByValue().reversed())
-                .limit(4)
+                .limit(6)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
 
@@ -244,13 +245,21 @@ public class CourseService {
                 .map(course -> toDto.map(course, CourseDto.class))
                 .collect(Collectors.toList()));
     }
-
+    @Async
     public CompletableFuture<List<CourseDto>> getCoursesByCategoryId(int categoryId) {
         List<Course> foundCourses = courseRepository.findByCategoryId(categoryId);
         return CompletableFuture.completedFuture(foundCourses.stream()
                 .map(course -> toDto.map(course, CourseDto.class))
                 .collect(Collectors.toList()));
 
+    }
+
+    @Async
+    public CompletableFuture<List<CourseDto>> findByUserId(int userId) {
+        return CompletableFuture.completedFuture(
+                courseRepository.findByUserId(userId).stream().map(
+                        x -> toDto.map(x, CourseDto.class)
+                ).collect(Collectors.toList()));
     }
     
 

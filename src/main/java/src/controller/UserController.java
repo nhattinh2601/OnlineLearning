@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
+import src.model.Review;
 import src.model.User;
 import src.service.User.Dto.UserCreateDto;
 import src.service.User.Dto.UserDto;
@@ -20,6 +21,7 @@ import java.util.concurrent.CompletableFuture;
 public class UserController {
     @Autowired
     private UserService userService;
+
 
 
     @GetMapping( "/{id}")
@@ -60,4 +62,6 @@ public class UserController {
     public CompletableFuture<String> deleteById(@PathVariable int id) {
         return userService.deleteById(id);
     }
+
+
 }

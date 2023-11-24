@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import src.model.Course;
+import src.model.Video;
 
 import java.util.List;
 
@@ -14,5 +15,6 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> searchByTitle(@Param("title") String title);
 
     List<Course> findByCategoryId(int categoryId);
+    List<Course> findByUserId(int userId);
 
 }

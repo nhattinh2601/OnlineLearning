@@ -19,7 +19,7 @@ import src.service.User.Dto.UserProfileDto;
 
 import src.service.User.auth.*;
 
-import java.util.List;
+import java.util.*;
 
 @RestController
 @ApiPrefixController("/auth")
@@ -35,6 +35,9 @@ public class AuthController {
     private MailService mailService;
     @Autowired
     private ModelMapper toDto;
+
+    private final Map<String, String> confirmationCodes = new HashMap<>();
+    private final Map<String, Timer> confirmationTimers = new HashMap<>();
 
     @PostMapping("/login")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid LoginInputDto loginRequest) throws Exception {
@@ -163,6 +166,71 @@ public class AuthController {
 
         return ResponseEntity.ok("Password changed successfully");
     }
+
+
+    @PostMapping("/forgetpassword/sendotp/{mail}")
+    public ResponseEntity<String> sendMessageMail(@PathVariable String mail) {
+        User user = userRepository.findByEmail(mail);
+
+        if (user == null) {
+            return new ResponseEntity<>("Email not found in the database", HttpStatus.BAD_REQUEST);
+        }
+
+        // Tạo mã xác nhận (ví dụ: một chuỗi ngẫu nhiên)
+        String confirmationCode = generateConfirmationCode();
+
+        // Lưu mã xác nhận với email tương ứng
+        confirmationCodes.put(mail, confirmationCode);
+
+        // Gửi email với mã xác nhận
+        mailService.sendOtpEmailForPassword(mail, confirmationCode);
+
+        // Đặt hẹn giờ để xóa mã xác nhận sau 5 phút
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                confirmationCodes.remove(mail);
+            }
+        }, 5 * 60 * 1000);  // 5 phút
+
+        // Lưu Timer để có thể hủy bỏ hẹn giờ nếu cần
+        confirmationTimers.put(mail, timer);
+
+        return new ResponseEntity<>("Successfully sent the confirmation email!", HttpStatus.OK);
+    }
+
+    private String generateConfirmationCode() {
+        // Tạo mã xác nhận ngẫu nhiên, ví dụ, sử dụng một chuỗi ngẫu nhiên
+        // (Trong thực tế, bạn có thể sử dụng cách bảo mật mạnh mẽ hơn)
+        return String.valueOf(new Random().nextInt(899999) + 100000);
+    }
+
+    @PostMapping("/confirm-reset-password/{mail}")
+    public ResponseEntity<String> confirmResetPassword(@PathVariable String mail, @RequestBody ConfirmResetDto confirmResetDto) {
+        // Kiểm tra xem mã xác nhận có đúng không
+        String storedCode = confirmationCodes.get(mail);
+        if (storedCode == null || !storedCode.equals(confirmResetDto.getConfirmationCode())) {
+            return new ResponseEntity<>("Invalid confirmation code", HttpStatus.BAD_REQUEST);
+        }
+
+        // Kiểm tra thêm điều kiện khác nếu cần thiết (ví dụ: thời gian hết hạn)
+
+        // Đặt lại mật khẩu
+        User user = userRepository.findByEmail(mail);
+        user.setPassword(JwtTokenUtil.hashPassword(confirmResetDto.getNewPassword()));
+        userRepository.save(user);
+
+        // Xóa mã xác nhận đã sử dụng và hủy bỏ hẹn giờ
+        confirmationCodes.remove(mail);
+        Timer timer = confirmationTimers.get(mail);
+        if (timer != null) {
+            timer.cancel();
+        }
+
+        return new ResponseEntity<>("Password reset successfully!", HttpStatus.OK);
+    }
+
 
 
 

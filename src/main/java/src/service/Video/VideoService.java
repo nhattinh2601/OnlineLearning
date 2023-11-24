@@ -150,6 +150,13 @@ public class VideoService {
                 break;
         }
     }
+    @Async
+    public CompletableFuture<List<VideoDto>> findByCourseId(int courseId) {
+        return CompletableFuture.completedFuture(
+                videoRepository.findByCourseId(courseId).stream().map(
+                        x -> toDto.map(x, VideoDto.class)
+                ).collect(Collectors.toList()));
+    }
 
 }
 

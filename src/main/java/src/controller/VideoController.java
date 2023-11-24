@@ -77,7 +77,10 @@ public class VideoController {
         return videoService.deleteById(id);
     }
 
-
+    @GetMapping("/course={courseId}")
+    public CompletableFuture<List<VideoDto>> findByCourseId(@PathVariable int courseId) {
+        return videoService.findByCourseId(courseId);
+    }
 
 
 

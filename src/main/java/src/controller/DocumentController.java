@@ -12,6 +12,7 @@ import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
 import src.service.Document.Dto.DocumentUpdateDto;
 import src.service.Document.DocumentService;
+import src.service.Video.Dto.VideoDto;
 
 import java.util.List;
 import java.util.Map;
@@ -68,4 +69,8 @@ public class DocumentController {
         return documentService.findAllPagination(request, size, page * size);
     }
 
+    @GetMapping("/course={courseId}")
+    public CompletableFuture<List<DocumentDto>> findByCourseId(@PathVariable int courseId) {
+        return documentService.findByCourseId(courseId);
+    }
 }

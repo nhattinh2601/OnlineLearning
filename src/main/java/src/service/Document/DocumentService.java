@@ -9,6 +9,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
@@ -16,10 +18,11 @@ import src.config.utils.ApiQuery;
 import src.model.Course;
 import src.model.Document;
 import src.model.Document;
-import src.model.Video;
+import src.model.Document;
 import src.repository.DocumentRepository;
 
 import src.service.Document.Dto.DocumentCreateDto;
+import src.service.Document.Dto.DocumentDto;
 import src.service.Document.Dto.DocumentDto;
 
 
@@ -96,7 +99,7 @@ public class DocumentService {
         long total = documentRepository.count();
         Pagination pagination = Pagination.create(total, skip, limit);
 
-        ApiQuery<Video> features = new ApiQuery<>(request, em, Video.class, pagination);
+        ApiQuery<Document> features = new ApiQuery<>(request, em, Document.class, pagination);
         return CompletableFuture.completedFuture(PagedResultDto.create(pagination,
                 features.filter().orderBy().paginate().exec().stream().map(x -> toDto.map(x, DocumentDto.class)).toList()));
     }
@@ -143,6 +146,14 @@ public class DocumentService {
                 break;
         }
     }
-
+    @Async
+    public CompletableFuture<List<DocumentDto>> findByCourseId(int courseId) {
+        return CompletableFuture.completedFuture(
+                documentRepository.findByCourseId(courseId).stream().map(
+                        x -> toDto.map(x, DocumentDto.class)
+                ).collect(Collectors.toList()));
+    }
+    
+    
 
 }

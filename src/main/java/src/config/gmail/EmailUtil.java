@@ -1,6 +1,7 @@
 package src.config.gmail;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class EmailUtil {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
             mimeMessageHelper.setTo(email);
+            mimeMessage.setSubject("Mã kích hoạt khóa học");
             mimeMessageHelper.setSubject("Verify OTP");
 
             String emailContent = String.format("""
@@ -34,4 +36,6 @@ public class EmailUtil {
             e.printStackTrace();
         }
     }
+
+
 }

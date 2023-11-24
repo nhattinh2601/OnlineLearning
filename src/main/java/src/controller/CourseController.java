@@ -13,6 +13,7 @@ import src.service.Course.Dto.CourseCreateDto;
 import src.service.Course.Dto.CourseDto;
 import src.service.Course.Dto.CourseUpdateDto;
 import src.service.Course.CourseService;
+import src.service.Video.Dto.VideoDto;
 
 import java.util.List;
 import java.util.Map;
@@ -93,4 +94,8 @@ public class CourseController {
         return courseService.getCoursesByCategoryId(categoryId);
     }
 
+    @GetMapping("/user={userId}")
+    public CompletableFuture<List<CourseDto>> findByCourseId(@PathVariable int userId) {
+        return courseService.findByUserId(userId);
+    }
 }
