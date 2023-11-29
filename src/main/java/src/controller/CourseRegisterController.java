@@ -12,6 +12,7 @@ import src.service.CourseRegister.CourseRegisterService;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;
 import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
+import src.service.CourseRegister.Dto.UserRegisterCourse;
 
 import java.util.List;
 import java.util.Map;
@@ -80,5 +81,17 @@ public class CourseRegisterController {
                                                                                    @RequestParam(required = false, defaultValue = "10") Integer size,
                                                                                    @RequestParam(required = false, defaultValue = "createAt") String orderBy) {
         return courseRegisterService.findAllPagination(request, size, page * size);
+    }
+
+    @GetMapping(value = "/getcourse/{id}")
+    public CompletableFuture<String> getCourseName(@PathVariable int id) {
+        return courseRegisterService.findCouseRegisterByCourseID(id);
+    }
+
+
+
+    @GetMapping(value = "/getcoursenoactive")
+    public List<UserRegisterCourse> getName() {
+        return courseRegisterService.getCourseRegisterNoActive();
     }
 }

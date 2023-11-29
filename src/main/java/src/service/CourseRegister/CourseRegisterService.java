@@ -24,13 +24,11 @@ import src.service.Category.Dto.CategoryDto;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;
 import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
+import src.service.CourseRegister.Dto.UserRegisterCourse;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -136,6 +134,14 @@ public class CourseRegisterService {
         }
     }
 
+    public CompletableFuture<String> findCouseRegisterByCourseID(int couseId) {
+        Optional<CourseRegister> exCourseRegister1 = courseRegisterRepository.findByCourseId(couseId);
+        CourseRegister cr1 = exCourseRegister1.get();
+        return CompletableFuture.completedFuture(cr1.getCourseByCourseId().getTitle());
+    }
+
+
+
     private void updateCourseRegisterField(CourseRegister courseRegister, String fieldName, Object value) {
         switch (fieldName) {
             case "otp":
@@ -203,6 +209,22 @@ public class CourseRegisterService {
     }
 
 
+    public List<UserRegisterCourse> getCourseRegisterNoActive() {
+
+        List<CourseRegister> newestCourses = courseRegisterRepository.findAll()
+                .stream()
+                .filter(courseRegister -> !courseRegister.getIsActive() )
+                .collect(Collectors.toList());
+
+        UserRegisterCourse ur1 = new UserRegisterCourse();
+        for (CourseRegister courseRegister : newestCourses) {
+            ur1.setFullname(courseRegister.getUserByUserId().getFullname());
+        }
+
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        userRegisterCourses.add(ur1);
+        return userRegisterCourses;
+    }
 
 }
 

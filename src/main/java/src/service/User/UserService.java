@@ -29,6 +29,7 @@ import src.repository.RoleRepository;
 import src.repository.UserRepository;
 import src.service.User.Dto.UserCreateDto;
 import src.service.User.Dto.UserDto;
+import src.service.Video.Dto.VideoDto;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -214,7 +215,13 @@ public class UserService {
     }
 
 
-
+    @Async
+    public CompletableFuture<List<UserDto>> findByRoleId(int roleId) {
+        return CompletableFuture.completedFuture(
+                userRepository.findByRoleId(roleId).stream().map(
+                        x -> toDto.map(x, UserDto.class)
+                ).collect(Collectors.toList()));
+    }
 
 }
 

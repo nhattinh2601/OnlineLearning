@@ -11,6 +11,7 @@ import src.service.User.Dto.UserCreateDto;
 import src.service.User.Dto.UserDto;
 import src.service.User.Dto.UserUpdateDto;
 import src.service.User.UserService;
+import src.service.Video.Dto.VideoDto;
 
 import java.util.List;
 import java.util.Map;
@@ -63,5 +64,10 @@ public class UserController {
         return userService.deleteById(id);
     }
 
+
+    @GetMapping("/role={roleId}")
+    public CompletableFuture<List<UserDto>> findByCourseId(@PathVariable int roleId) {
+        return userService.findByRoleId(roleId);
+    }
 
 }
