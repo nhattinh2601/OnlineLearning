@@ -63,6 +63,7 @@ public class DocumentService {
         Document document = new Document();
         document.setFile_path(input.getFile_path());
         document.setTitle(input.getTitle());
+        document.setImage(input.getImage());
         document.setCourseId(input.getCourseId());
 
         Document savedDocument = documentRepository.save(document);
@@ -153,7 +154,10 @@ public class DocumentService {
                         x -> toDto.map(x, DocumentDto.class)
                 ).collect(Collectors.toList()));
     }
-    
+
+    public int countDocumentsByCourseId(int courseId) {
+        return documentRepository.countByCourseId(courseId);
+    }
     
 
 }

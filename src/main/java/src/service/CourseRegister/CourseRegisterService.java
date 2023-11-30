@@ -9,17 +9,18 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import src.Dto.CourseRegisterUserDTO;
+import src.Dto.ReviewUserDTO;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.gmail.EmailUtil;
 import src.config.gmail.OtpUtil;
 import src.config.utils.ApiQuery;
-import src.model.Category;
-import src.model.Course;
-import src.model.CourseRegister;
-import src.model.User;
+import src.model.*;
 import src.repository.CourseRegisterRepository;
+import src.repository.CourseRepository;
+import src.repository.UserRepository;
 import src.service.Category.Dto.CategoryDto;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
 import src.service.CourseRegister.Dto.CourseRegisterDto;
@@ -27,10 +28,7 @@ import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -38,6 +36,10 @@ import java.util.stream.Collectors;
 public class CourseRegisterService {
     @Autowired
     private CourseRegisterRepository courseRegisterRepository;
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private ModelMapper toDto;
     @Autowired
@@ -201,6 +203,30 @@ public class CourseRegisterService {
         courseRegisterRepository.save(courseRegister);
         return "Email sent... please verify account within 1 minute";
     }
+
+
+
+    public CourseRegisterUserDTO getCourseRegisterByUser(int user, int course) {
+        Optional<CourseRegister> optional = courseRegisterRepository.findByUserIdAndCourseId(user, course);
+        if (optional.isPresent()) {
+            CourseRegister courseRegister = optional.get();
+
+            CourseRegisterUserDTO dto = new CourseRegisterUserDTO();
+            dto.setUserId(courseRegister.getUserByUserId().getId());
+            dto.setCourseId(courseRegister.getCourseByCourseId().getId());
+            dto.setUsercourseId(courseRegister.getCourseByCourseId().getUserId());
+            dto.setActive(courseRegister.getCourseByCourseId().getActive());
+            dto.setIsActive(courseRegister.getIsActive());
+
+
+            return dto;
+        }
+
+        // Trường hợp không tìm thấy review với reviewId
+        return null;
+    }
+
+
 
 
 

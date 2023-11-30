@@ -15,7 +15,6 @@ public class VideoCreateDto {
     private String image;
     @JsonProperty(value = "courseId")
     private int courseId;
-    @JsonProperty(value = "isDeleted")
-    public Boolean isDeleted  = false;
+
 
 }

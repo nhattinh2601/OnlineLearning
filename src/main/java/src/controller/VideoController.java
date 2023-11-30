@@ -83,6 +83,12 @@ public class VideoController {
     }
 
 
+    @GetMapping("/countByCourse/{courseId}")
+    public int countVideosByCourseId(@PathVariable int courseId) {
+        return videoService.countVideosByCourseId(courseId);
+    }
+
+
 
 
 }

@@ -5,8 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import src.Dto.CourseRegisterUserDTO;
+import src.Dto.ReviewUserDTO;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
+import src.model.Course;
 import src.model.CourseRegister;
 import src.service.CourseRegister.CourseRegisterService;
 import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
@@ -81,4 +84,18 @@ public class CourseRegisterController {
                                                                                    @RequestParam(required = false, defaultValue = "createAt") String orderBy) {
         return courseRegisterService.findAllPagination(request, size, page * size);
     }
+
+
+
+    @GetMapping("/revivewer/{userId}/{courseId}")
+    public ResponseEntity<CourseRegisterUserDTO> getCourseRegisterByUser(@PathVariable int userId,@PathVariable int courseId) {
+        CourseRegisterUserDTO course = courseRegisterService.getCourseRegisterByUser(userId, courseId);
+        if (course != null) {
+            return new ResponseEntity<>(course, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 }

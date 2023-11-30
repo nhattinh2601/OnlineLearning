@@ -117,13 +117,13 @@ public class CourseService {
                 course.setTitle((String) value);
                 break;
             case "price":
-                course.setPrice((double) value);
+                course.setPrice((int) value);
                 break;
             case "promotional_price":
-                course.setPromotional_price((double) value);
+                course.setPromotional_price((int) value);
                 break;
             case "sold":
-                course.setSold((double) value);
+                course.setSold((int) value);
                 break;
             case "description":
                 course.setDescription((String) value);

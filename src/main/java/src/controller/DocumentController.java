@@ -12,7 +12,7 @@ import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
 import src.service.Document.Dto.DocumentUpdateDto;
 import src.service.Document.DocumentService;
-import src.service.Video.Dto.VideoDto;
+import src.service.Document.Dto.DocumentDto;
 
 import java.util.List;
 import java.util.Map;
@@ -72,5 +72,10 @@ public class DocumentController {
     @GetMapping("/course={courseId}")
     public CompletableFuture<List<DocumentDto>> findByCourseId(@PathVariable int courseId) {
         return documentService.findByCourseId(courseId);
+    }
+
+    @GetMapping("/countByCourse/{courseId}")
+    public int countDocumentsByCourseId(@PathVariable int courseId) {
+        return documentService.countDocumentsByCourseId(courseId);
     }
 }

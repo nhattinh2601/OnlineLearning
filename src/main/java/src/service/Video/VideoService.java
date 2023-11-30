@@ -134,6 +134,9 @@ public class VideoService {
             case "video_filepath":
                 video.setVideo_filepath((String) value);
                 break;
+            case "title":
+                video.setTitle((String) value);
+                break;
             case "description":
                 video.setDescription((String) value);
                 break;
@@ -156,6 +159,10 @@ public class VideoService {
                 videoRepository.findByCourseId(courseId).stream().map(
                         x -> toDto.map(x, VideoDto.class)
                 ).collect(Collectors.toList()));
+    }
+
+    public int countVideosByCourseId(int courseId) {
+        return videoRepository.countByCourseId(courseId);
     }
 
 }
