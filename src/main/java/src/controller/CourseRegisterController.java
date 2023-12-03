@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.Dto.CourseRegisterUserDTO;
+import src.Dto.RegisterCourseDTO;
 import src.Dto.ReviewUserDTO;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
@@ -95,6 +96,12 @@ public class CourseRegisterController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<RegisterCourseDTO>> getReviewsByUserId(@PathVariable int userId) {
+        List<RegisterCourseDTO> register = courseRegisterService.getRegisterCourse(userId);
+        return new ResponseEntity<>(register, HttpStatus.OK);
     }
 
 

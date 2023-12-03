@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import src.Dto.OrdersWithOrderItemDTO;
 import src.config.annotation.ApiPrefixController;
 
 import src.model.Orders;
@@ -48,6 +49,13 @@ public class OrderController {
     public CompletableFuture<String> deleteById(@PathVariable int id) {
         return orderService.deleteById(id);
     }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<OrdersWithOrderItemDTO>> getOrdersWithOrderItemsByUserId(@PathVariable int userId) {
+        List<OrdersWithOrderItemDTO> orders = orderService.findOrdersWithOrderItemByUserId(userId);
+        return ResponseEntity.ok(orders);
+    }
+
 
 
 }

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import src.Dto.CourseRegisterUserDTO;
+import src.Dto.RegisterCourseDTO;
 import src.Dto.ReviewUserDTO;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
@@ -224,6 +225,29 @@ public class CourseRegisterService {
 
         // Trường hợp không tìm thấy review với reviewId
         return null;
+    }
+
+    public List<RegisterCourseDTO> getRegisterCourse(int userId) {
+        List<RegisterCourseDTO> result = new ArrayList<>();
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findByUserId(userId);
+
+        for (CourseRegister courseRegister : courseRegisters) {
+            RegisterCourseDTO dto = new RegisterCourseDTO();
+            dto.setCourseId(courseRegister.getCourseId());
+            dto.setUserId(courseRegister.getUserId());
+            dto.setTitle(courseRegister.getCourseByCourseId().getTitle());
+            dto.setImage(courseRegister.getCourseByCourseId().getImage());
+            dto.setName(courseRegister.getCourseByCourseId().getUserByUserId().getFullname());
+            dto.setActive(courseRegister.getCourseByCourseId().getActive());
+            dto.setIsActive(courseRegister.getIsActive());
+            dto.setDeleted(courseRegister.getCourseByCourseId().getIsDeleted());
+            dto.setIsDeleted(courseRegister.getIsDeleted());
+
+            result.add(dto);
+        }
+
+        return result;
     }
 
 

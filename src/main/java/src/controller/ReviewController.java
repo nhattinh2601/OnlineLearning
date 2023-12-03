@@ -84,14 +84,14 @@ public class ReviewController {
         return reviewService.findByUserId(userId);
     }
 
-    @GetMapping("/course={courseId}")
+    /*@GetMapping("/course={courseId}")
     public CompletableFuture<List<ReviewDto>> findByCourseId(@PathVariable int courseId) {
         return reviewService.findByCourseId(courseId);
-    }
+    }*/
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ReviewUserDTO>> getReviewsByUserId(@PathVariable int userId) {
-        List<ReviewUserDTO> reviews = reviewService.getReviewsByUserId(userId);
+    @GetMapping("/course={courseId}")
+    public ResponseEntity<List<ReviewUserDTO>> getReviewsByUserId(@PathVariable int courseId) {
+        List<ReviewUserDTO> reviews = reviewService.getReviewsByUserId(courseId);
         return new ResponseEntity<>(reviews, HttpStatus.OK);
     }
 

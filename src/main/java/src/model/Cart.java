@@ -40,6 +40,9 @@ public class Cart {
     public Cart(int id) {
     }
 
+    public Cart() {
+    }
+
     //// Id  bảng này là khóa ngoại của bảng khác
 
 }
