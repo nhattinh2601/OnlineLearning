@@ -104,5 +104,9 @@ public class CourseRegisterController {
         return new ResponseEntity<>(register, HttpStatus.OK);
     }
 
+    @GetMapping("/course/{courseId}/students/count")
+    public Long countStudentsForCourse(@PathVariable int courseId) {
+        return courseRegisterService.countStudentsForCourse(courseId);
+    }
 
 }

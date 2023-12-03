@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import src.Dto.CommentUserDTO;
+import src.Dto.ReviewUserDTO;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
 import src.model.Comment;
@@ -74,5 +76,11 @@ public class CommentController {
     @GetMapping("/{id}/features")
     public CompletableFuture<List<CommentDto>> getCommentFeatures(@PathVariable("id") int parentCommentId) {
         return commentService.getCommentFeatures(parentCommentId);
+    }
+
+    @GetMapping("/video={videoId}")
+    public ResponseEntity<List<CommentUserDTO>> getVideosByUserId(@PathVariable int videoId) {
+        List<CommentUserDTO> comments = commentService.getVideosByUserId(videoId);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 }

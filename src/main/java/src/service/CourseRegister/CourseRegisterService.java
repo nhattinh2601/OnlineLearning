@@ -250,7 +250,9 @@ public class CourseRegisterService {
         return result;
     }
 
-
+    public Long countStudentsForCourse(int courseId) {
+        return courseRegisterRepository.countDistinctUsersByCourseId(courseId);
+    }
 
 
 

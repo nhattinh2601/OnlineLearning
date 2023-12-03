@@ -8,21 +8,21 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import src.Dto.CommentUserDTO;
+import src.Dto.ReviewUserDTO;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Comment;
+import src.model.Review;
 import src.model.User;
 import src.repository.CommentRepository;
 import src.service.Comment.Dto.CommentCreateDto;
 import src.service.Comment.Dto.CommentDto;
 import src.service.Comment.Dto.CommentUpdateDto;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -105,7 +105,7 @@ public class CommentService {
 
     private void updateCommentField(Comment comment, String fieldName, Object value) {
         switch (fieldName) {
-            case "cotent":
+            case "content":
                 comment.setContent((String) value);
                 break;
             case "videoId":
@@ -163,5 +163,27 @@ public class CommentService {
         return CompletableFuture.completedFuture(categories.stream().map(
                 x -> toDto.map(x, CommentDto.class)
         ).collect(Collectors.toList()));
+    }
+
+    public List<CommentUserDTO> getVideosByUserId(int videoId) {
+        List<CommentUserDTO> result = new ArrayList<>();
+
+        List<Comment> comments = commentRepository.findByVideoId(videoId);
+
+        for (Comment comment : comments) {
+            CommentUserDTO dto = new CommentUserDTO();
+            dto.setCommentId(comment.getId());
+            dto.setContent(comment.getContent());
+            dto.setFullname(comment.getUserByUserId().getFullname());
+            dto.setAvatar(comment.getUserByUserId().getAvatar());
+            dto.setUserId(comment.getUserByUserId().getId());
+            dto.setVideoId(comment.getVideoId());
+            dto.setIsDeleted(comment.getIsDeleted());
+            dto.setCreate(comment.getCreateAt());
+            dto.setUpdate(comment.getUpdateAt());
+            result.add(dto);
+        }
+
+        return result;
     }
 }

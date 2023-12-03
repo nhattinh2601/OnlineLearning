@@ -8,21 +8,21 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import src.Dto.RatingDTO;
+import src.Dto.ReviewUserDTO;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Rating;
 import src.model.Rating;
+import src.model.Review;
 import src.repository.RatingRepository;
 import src.service.Rating.Dto.RatingCreateDto;
 import src.service.Rating.Dto.RatingDto;
 import src.service.Rating.Dto.RatingUpdateDto;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -138,5 +138,73 @@ public class RatingService {
             default:
                 break;
         }
+    }
+
+    public Double calculateOverallRating(int courseId) {
+        return ratingRepository.calculateOverallRating(courseId);
+    }
+
+    public Map<Integer, Double> calculateRatingDistribution(int courseId) {
+        List<Object[]> distributionData = ratingRepository.calculateRatingDistribution(courseId);
+
+        Map<Integer, Double> distributionMap = new HashMap<>();
+
+        long totalRatings = getTotalRatings(distributionData);
+
+        // Initialize percentages for all ratings
+        for (int i = 1; i <= 5; i++) {
+            distributionMap.put(i, 0.0);
+        }
+
+        // Update percentages based on existing data
+        for (Object[] data : distributionData) {
+            int rating = (int) data[0];
+            long count = (long) data[1];
+
+            double percentage = (totalRatings > 0) ? (count / (double) totalRatings) * 100.0 : 0.0;
+
+            distributionMap.put(rating, percentage);
+        }
+
+        return distributionMap;
+    }
+    private double getPercentage(List<Object[]> distributionData, int rating, long totalRatings) {
+        for (Object[] data : distributionData) {
+            int currentRating = (int) data[0];
+            long count = (long) data[1];
+
+            if (currentRating == rating) {
+                return (count / totalRatings) * 100.0;
+            }
+        }
+
+        return 0.0; // If no count found for the current rating
+    }
+
+    private long getTotalRatings(List<Object[]> distributionData) {
+        return distributionData.stream().mapToLong(data -> (long) data[1]).sum();
+    }
+
+    public Long countStudentsForCourse(int courseId) {
+        return ratingRepository.countDistinctUsersByCourseId(courseId);
+    }
+
+    public List<RatingDTO> findRatingByUserCourse(int userId, int courseId) {
+        List<RatingDTO> result = new ArrayList<>();
+
+        List<Rating> ratings = ratingRepository.findRatingByUserCourse(userId, courseId);
+
+        for (Rating rating : ratings) {
+            RatingDTO dto = new RatingDTO();
+            dto.setId(rating.getId());
+
+            dto.setUserId(rating.getUserByUserId().getId());
+            dto.setCourseId(rating.getCourseId());
+            dto.setRating(rating.getRating());
+
+            result.add(dto);
+        }
+
+        return result;
     }
 }

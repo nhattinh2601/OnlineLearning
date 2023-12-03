@@ -1,6 +1,7 @@
 package src.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import src.model.CourseRegister;
 import src.model.Review;
@@ -14,5 +15,8 @@ public interface CourseRegisterRepository extends JpaRepository<CourseRegister, 
     Optional<CourseRegister> findByUserIdAndCourseId(int userId, int courseId);
 
     List<CourseRegister> findByUserId(int userId);
+
+    @Query("SELECT COUNT(DISTINCT r.userByUserId) FROM CourseRegister r WHERE r.courseId = :courseId")
+    Long countDistinctUsersByCourseId(int courseId);
 
 }
