@@ -3,6 +3,7 @@ package src.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
@@ -11,9 +12,10 @@ import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
 import src.service.Document.Dto.DocumentUpdateDto;
 import src.service.Document.DocumentService;
-import src.service.Video.Dto.VideoDto;
+import src.service.Document.Dto.DocumentDto;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -37,9 +39,22 @@ public class DocumentController {
         return documentService.create(input);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<DocumentDto> update(@PathVariable int id, DocumentUpdateDto document) {
         return documentService.update(id, document);
+    }*/
+    @PatchMapping("/{documentId}")
+    public ResponseEntity<Document> updateDocumentField(
+            @PathVariable int documentId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Document updatedDocument = documentService.updateDocument(documentId, fieldsToUpdate);
+
+        if (updatedDocument != null) {
+            return ResponseEntity.ok(updatedDocument);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -54,4 +69,13 @@ public class DocumentController {
         return documentService.findAllPagination(request, size, page * size);
     }
 
+    @GetMapping("/course={courseId}")
+    public CompletableFuture<List<DocumentDto>> findByCourseId(@PathVariable int courseId) {
+        return documentService.findByCourseId(courseId);
+    }
+
+    @GetMapping("/countByCourse/{courseId}")
+    public int countDocumentsByCourseId(@PathVariable int courseId) {
+        return documentService.countDocumentsByCourseId(courseId);
+    }
 }

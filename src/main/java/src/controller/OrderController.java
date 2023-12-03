@@ -7,9 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 
-import src.model.Category;
 import src.model.Orders;
-import src.service.Category.Dto.CategoryCreateDto;
 import src.service.Orders.Dto.OrderCreateDto;
 import src.service.Orders.Dto.OrderDto;
 import src.service.Orders.Dto.OrderUpdateDto;

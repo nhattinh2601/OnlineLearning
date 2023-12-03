@@ -9,6 +9,8 @@ public class DocumentCreateDto {
     private String file_path;
     @JsonProperty(value = "title", required = true)
     private String title;
+    @JsonProperty(value = "image", required = true)
+    private String image;
     @JsonProperty(value = "courseId", required = true)
     private int courseId;
 }

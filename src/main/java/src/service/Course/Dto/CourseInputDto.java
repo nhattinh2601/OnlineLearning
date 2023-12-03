@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data
 public class CourseInputDto {
+    @JsonProperty(value = "title", required = true)
+    private String title;
     @JsonProperty(value = "price", required = true, defaultValue = "0")
     private double price;
     @JsonProperty(value = "promotional_price", required = true, defaultValue = "0")

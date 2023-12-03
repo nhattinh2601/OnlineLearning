@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import src.config.exception.UnauthorizedException;
+import src.service.User.UserService;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -16,7 +17,7 @@ import java.util.Objects;
 @Aspect
 @Component
 public class AuthenticateAspect {
-   /* private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtil jwtTokenUtil;
     private final UserService userDetailsService;
 
     public AuthenticateAspect(UserService userDetailsService, JwtTokenUtil jwtTokenUtil) {
@@ -48,5 +49,5 @@ public class AuthenticateAspect {
             return requestTokenHeader.substring(7);
         }
         return null;
-    }*/
+    }
 }

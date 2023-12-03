@@ -3,15 +3,18 @@ package src.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import src.config.annotation.ApiPrefixController;
 import src.config.dto.PagedResultDto;
+import src.model.Feedback;
 import src.service.Feedback.Dto.FeedbackCreateDto;
 import src.service.Feedback.Dto.FeedbackDto;
 import src.service.Feedback.Dto.FeedbackUpdateDto;
 import src.service.Feedback.FeedbackService;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -42,9 +45,23 @@ public class FeedbackController {
         return feedbackService.create(input);
     }
 
-    @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CompletableFuture<FeedbackDto> update(@PathVariable int id, FeedbackUpdateDto feedback) {
         return feedbackService.update(id, feedback);
+    }*/
+
+    @PatchMapping("/{feedbackId}")
+    public ResponseEntity<Feedback> updateFeedbackField(
+            @PathVariable int feedbackId,
+            @RequestBody Map<String, Object> fieldsToUpdate) {
+
+        Feedback updatedFeedback = feedbackService.updateFeedback(feedbackId, fieldsToUpdate);
+
+        if (updatedFeedback != null) {
+            return ResponseEntity.ok(updatedFeedback);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

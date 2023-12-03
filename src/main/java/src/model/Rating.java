@@ -11,7 +11,7 @@ import java.util.*;
 public class Rating {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "course_register_id", nullable = false)
+    @Column(name = "rating_id", nullable = false)
     private int Id;
     @Basic
     @Column(name = "rating", nullable = false)

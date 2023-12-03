@@ -8,19 +8,23 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import src.Dto.ReviewUserDTO;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Review;
+import src.model.Review;
+import src.model.Review;
 import src.repository.ReviewRepository;
+import src.service.Review.Dto.ReviewDto;
+import src.service.Review.Dto.ReviewCreateDto;
+import src.service.Review.Dto.ReviewDto;
 import src.service.Review.Dto.ReviewCreateDto;
 import src.service.Review.Dto.ReviewDto;
 import src.service.Review.Dto.ReviewUpdateDto;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -54,14 +58,15 @@ public class ReviewService {
     @Async
     public CompletableFuture<ReviewDto> create(ReviewCreateDto input) {
         Review review = new Review();
-        review.setCourseId(input.getCourseId());
+        review.setContent(input.getContent());
         review.setUserId(input.getUserId());
+        review.setCourseId(input.getCourseId());
 
         Review savedReview = reviewRepository.save(review);
         return CompletableFuture.completedFuture(toDto.map(savedReview, ReviewDto.class));
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<ReviewDto> update(int id, ReviewUpdateDto reviews) {
         Review existingReview = reviewRepository.findById(id).orElse(null);
         if (existingReview == null)
@@ -69,7 +74,7 @@ public class ReviewService {
         BeanUtils.copyProperties(reviews, existingReview);
         existingReview.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(reviewRepository.save(existingReview), ReviewDto.class));
-    }
+    }*/
 
     @Async
     public CompletableFuture<PagedResultDto<ReviewDto>> findAllPagination(HttpServletRequest request, Integer limit, Integer skip) {
@@ -96,5 +101,92 @@ public class ReviewService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture("Xóa không được");
         }
+    }
+    public Review updateReview(int reviewId, Map<String, Object> fieldsToUpdate) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+            updateReviewFields(review, fieldsToUpdate);
+            review.setUpdateAt(new Date());
+            reviewRepository.save(review);
+            return review;
+        }
+
+        return null;
+    }
+
+    private void updateReviewFields(Review review, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateReviewField(review, fieldName, value);
+        }
+    }
+
+    private void updateReviewField(Review review, String fieldName, Object value) {
+        switch (fieldName) {
+            case "content":
+                review.setContent((String) value);
+                break;
+            case "courseId":
+                review.setCourseId((int) value);
+                break;
+            case "roleId":
+                review.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    @Async
+    public CompletableFuture<List<ReviewDto>> findByCourseId(int courseId) {
+        return CompletableFuture.completedFuture(
+                reviewRepository.findByCourseId(courseId).stream().map(
+                        x -> toDto.map(x, ReviewDto.class)
+                ).collect(Collectors.toList()));
+    }
+    @Async
+    public CompletableFuture<List<ReviewDto>> findByUserId(int userId) {
+        return CompletableFuture.completedFuture(
+                reviewRepository.findByUserId(userId).stream().map(
+                        x -> toDto.map(x, ReviewDto.class)
+                ).collect(Collectors.toList()));
+    }
+
+    public List<ReviewUserDTO> getReviewsByUserId(int userId) {
+        List<ReviewUserDTO> result = new ArrayList<>();
+
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+
+        for (Review review : reviews) {
+            ReviewUserDTO dto = new ReviewUserDTO();
+            dto.setReviewId(review.getId());
+            dto.setContent(review.getContent());
+            dto.setFullname(review.getUserByUserId().getFullname());
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+    public ReviewUserDTO getReviewByReviewId(int reviewId) {
+        Optional<Review> optionalReview = reviewRepository.findById(reviewId);
+        if (optionalReview.isPresent()) {
+            Review review = optionalReview.get();
+
+            ReviewUserDTO dto = new ReviewUserDTO();
+            dto.setReviewId(review.getId());
+            dto.setContent(review.getContent());
+            dto.setFullname(review.getUserByUserId().getFullname()); // Tùy thuộc vào cách bạn đã đặt tên username trong User entity
+
+            return dto;
+        }
+
+        // Trường hợp không tìm thấy review với reviewId
+        return null;
     }
 }

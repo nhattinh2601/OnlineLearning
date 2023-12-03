@@ -57,6 +57,8 @@ public class AppConfig implements WebMvcConfigurer {
         return new BCryptPasswordEncoder();
     }
 
+
+
     @Bean
     public ModelMapper getModelMapper() {
         return new ModelMapper();
@@ -105,6 +107,7 @@ public class AppConfig implements WebMvcConfigurer {
     public RateLimiterInterceptor rateLimiterInterceptor(RateLimiterRegistry rateLimiterRegistry) {
         return new RateLimiterInterceptor(rateLimiterRegistry);
     }
+
 
 
 }

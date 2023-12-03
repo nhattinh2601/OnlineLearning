@@ -9,7 +9,7 @@ import java.util.*;
 public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    @Column(name = "course_register_id", nullable = false)
+    @Column(name = "review_id", nullable = false)
     private int Id;
     @Basic
     @Column(name = "content", length = 255)

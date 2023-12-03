@@ -9,22 +9,26 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Course;
 import src.model.Document;
-import src.model.Video;
+import src.model.Document;
+import src.model.Document;
 import src.repository.DocumentRepository;
-import src.service.Course.Dto.CourseDto;
+
 import src.service.Document.Dto.DocumentCreateDto;
 import src.service.Document.Dto.DocumentDto;
-import src.service.Document.Dto.DocumentUpdateDto;
-import src.service.Video.Dto.VideoDto;
+import src.service.Document.Dto.DocumentDto;
+
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -59,20 +63,21 @@ public class DocumentService {
         Document document = new Document();
         document.setFile_path(input.getFile_path());
         document.setTitle(input.getTitle());
+        document.setImage(input.getImage());
         document.setCourseId(input.getCourseId());
 
         Document savedDocument = documentRepository.save(document);
         return CompletableFuture.completedFuture(toDto.map(savedDocument, DocumentDto.class));
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<DocumentDto> update(int id, DocumentUpdateDto documents) {
         Document existingDocument = documentRepository.findById(id).orElse(null);
         if (existingDocument == null)
             throw new NotFoundException("Unable to find document!");
         BeanUtils.copyProperties(documents, existingDocument);
         return CompletableFuture.completedFuture(toDto.map(documentRepository.save(existingDocument), DocumentDto.class));
-    }
+    }*/
 
     @Async
     public CompletableFuture<String> deleteById(int id) {
@@ -95,9 +100,64 @@ public class DocumentService {
         long total = documentRepository.count();
         Pagination pagination = Pagination.create(total, skip, limit);
 
-        ApiQuery<Video> features = new ApiQuery<>(request, em, Video.class, pagination);
+        ApiQuery<Document> features = new ApiQuery<>(request, em, Document.class, pagination);
         return CompletableFuture.completedFuture(PagedResultDto.create(pagination,
                 features.filter().orderBy().paginate().exec().stream().map(x -> toDto.map(x, DocumentDto.class)).toList()));
     }
+
+    public Document updateDocument(int documentId, Map<String, Object> fieldsToUpdate) {
+        Optional<Document> optionalDocument = documentRepository.findById(documentId);
+
+        if (optionalDocument.isPresent()) {
+            Document document = optionalDocument.get();
+            updateDocumentFields(document, fieldsToUpdate);
+            document.setUpdateAt(new Date());
+            documentRepository.save(document);
+            return document;
+        }
+
+        return null;
+    }
+
+    private void updateDocumentFields(Document document, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateDocumentField(document, fieldName, value);
+        }
+    }
+
+    private void updateDocumentField(Document document, String fieldName, Object value) {
+        switch (fieldName) {
+            case "file_path":
+                document.setFile_path((String) value);
+                break;
+            case "title":
+                document.setTitle((String) value);
+                break;
+            case "image":
+                document.setImage((String) value);
+                break;
+
+            case "courseId":
+                document.setCourseId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+    @Async
+    public CompletableFuture<List<DocumentDto>> findByCourseId(int courseId) {
+        return CompletableFuture.completedFuture(
+                documentRepository.findByCourseId(courseId).stream().map(
+                        x -> toDto.map(x, DocumentDto.class)
+                ).collect(Collectors.toList()));
+    }
+
+    public int countDocumentsByCourseId(int courseId) {
+        return documentRepository.countByCourseId(courseId);
+    }
+    
 
 }

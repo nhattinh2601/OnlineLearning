@@ -13,23 +13,22 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Video;
+
 import src.repository.VideoRepository;
 import src.service.Video.Dto.VideoCreateDto;
 import src.service.Video.Dto.VideoDto;
-import src.service.Video.Dto.VideoUpdateDto;
+
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
 public class VideoService {
-    private static final String APPLICATION_NAME = "Your Application Name";
-    private static final String SERVICE_ACCOUNT_EMAIL = "your-service-account-email@your-project.iam.gserviceaccount.com";
-    private static final String P12_FILE_PATH = "path/to/your/p12/file.p12";
-    private static final String ROOT_FOLDER_ID = "root";
+
     @Autowired
     private VideoRepository videoRepository;
     @Autowired
@@ -71,7 +70,7 @@ public class VideoService {
         return future;
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<VideoDto> update(int id, VideoUpdateDto videos) {
         Video existingVideo = videoRepository.findById(id).orElse(null);
         if (existingVideo == null)
@@ -79,7 +78,7 @@ public class VideoService {
         BeanUtils.copyProperties(videos, existingVideo);
         existingVideo.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(videoRepository.save(existingVideo), VideoDto.class));
-    }
+    }*/
 
     @Async
     public CompletableFuture<PagedResultDto<VideoDto>> findAllPagination(HttpServletRequest request, Integer limit, Integer skip) {
@@ -106,6 +105,64 @@ public class VideoService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture("Xóa không được");
         }
+    }
+
+    public Video updateVideo(int videoId, Map<String, Object> fieldsToUpdate) {
+        Optional<Video> optionalVideo = videoRepository.findById(videoId);
+
+        if (optionalVideo.isPresent()) {
+            Video video = optionalVideo.get();
+            updateVideoFields(video, fieldsToUpdate);
+            video.setUpdateAt(new Date());
+            videoRepository.save(video);
+            return video;
+        }
+
+        return null;
+    }
+
+    private void updateVideoFields(Video video, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateVideoField(video, fieldName, value);
+        }
+    }
+
+    private void updateVideoField(Video video, String fieldName, Object value) {
+        switch (fieldName) {
+            case "video_filepath":
+                video.setVideo_filepath((String) value);
+                break;
+            case "title":
+                video.setTitle((String) value);
+                break;
+            case "description":
+                video.setDescription((String) value);
+                break;
+            case "image":
+                video.setImage((String) value);
+                break;
+            case "isDeleted":
+                video.setIsDeleted((Boolean) value);
+                break;
+            case "courseId":
+                video.setCourseId((int) value);
+                break;
+            default:
+                break;
+        }
+    }
+    @Async
+    public CompletableFuture<List<VideoDto>> findByCourseId(int courseId) {
+        return CompletableFuture.completedFuture(
+                videoRepository.findByCourseId(courseId).stream().map(
+                        x -> toDto.map(x, VideoDto.class)
+                ).collect(Collectors.toList()));
+    }
+
+    public int countVideosByCourseId(int courseId) {
+        return videoRepository.countByCourseId(courseId);
     }
 
 }

@@ -10,29 +10,34 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import src.config.dto.PagedResultDto;
 import src.config.dto.Pagination;
+import src.config.exception.BadRequestException;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Cart;
-import src.model.CourseRegister;
+import src.model.Cart;
+import src.model.OrderItem;
+import src.model.Orders;
 import src.repository.CartRepository;
-import src.service.Cart.Dto.CartCreateDto;
+import src.repository.OrderItemRepository;
+import src.repository.OrdersRepository;
 import src.service.Cart.Dto.CartDto;
+import src.service.Cart.Dto.CartOrderDTO;
 import src.service.Cart.Dto.CartUpdateDto;
-import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
-import src.service.CourseRegister.Dto.CourseRegisterDto;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
-
-import static java.sql.Types.NULL;
 
 @Service
 public class CartService {
     @Autowired
     private CartRepository cartRepository;
+
+    @Autowired
+    private OrdersRepository ordersRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
+
     @Autowired
     private ModelMapper toDto;
 
@@ -57,16 +62,42 @@ public class CartService {
     }
 
     @Async
-    public CompletableFuture<CartDto> create(CartCreateDto input) {
-        Cart cart = new Cart();
-        cart.setCourseId(input.getCourseId());
-        cart.setUserId(input.getUserId());
+    public CompletableFuture<CartDto> create(CartOrderDTO cartOrderDTO) {
+        try {
+            List<Cart> existCart = cartRepository.findCart(
+                    cartOrderDTO.getUserId(), cartOrderDTO.getCourseId());
+            List<Orders> existUser = ordersRepository.findUser(
+                    cartOrderDTO.getUserId());
+            List<OrderItem> existCourse = orderItemRepository.findCourse(
+                    cartOrderDTO.getCourseId());
 
-        Cart savedCart = cartRepository.save(cart);
-        return CompletableFuture.completedFuture(toDto.map(savedCart, CartDto.class));
+
+            if (!existCart.isEmpty()) {
+                // Handle case where cart already exists
+                throw new BadRequestException("Giỏ hàng chỉ tồn tại 1 khóa học");
+            }
+            if (!existUser.isEmpty() && !existCourse.isEmpty()) {
+                // Both user and course exist, indicating the course has already been paid
+                throw new BadRequestException("Khóa học đã được thanh toán");
+            }
+
+            Cart cart = new Cart();
+            cart.setCourseId(cartOrderDTO.getCourseId());
+            cart.setUserId(cartOrderDTO.getUserId());
+            cartRepository.save(cart);
+
+            // Assuming toDto is some kind of mapper, map the Cart to CourseDto
+            CartDto cartDto = toDto.map(cart, CartDto.class);
+
+            return CompletableFuture.completedFuture(cartDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return CompletableFuture.failedFuture(new RuntimeException("Thêm giỏ hàng thất bại"));
+        }
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<CartDto> update(int id, CartUpdateDto carts) {
         Cart existingCart = cartRepository.findById(id).orElse(null);
         if (existingCart == null)
@@ -74,6 +105,41 @@ public class CartService {
         BeanUtils.copyProperties(carts, existingCart);
         existingCart.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(cartRepository.save(existingCart), CartDto.class));
+    }*/
+    public Cart updateCart(int cartId, Map<String, Object> fieldsToUpdate) {
+        Optional<Cart> optionalCart = cartRepository.findById(cartId);
+
+        if (optionalCart.isPresent()) {
+            Cart cart = optionalCart.get();
+            updateCartFields(cart, fieldsToUpdate);
+            cart.setUpdateAt(new Date());
+            cartRepository.save(cart);
+            return cart;
+        }
+
+        return null;
+    }
+
+    private void updateCartFields(Cart cart, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateCartField(cart, fieldName, value);
+        }
+    }
+
+    private void updateCartField(Cart cart, String fieldName, Object value) {
+        switch (fieldName) {
+            case "courseId":
+                cart.setCourseId((int) value);
+                break;
+            case "userId":
+                cart.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
     }
 
     @Async
@@ -101,5 +167,27 @@ public class CartService {
         } catch (Exception e) {
             return CompletableFuture.completedFuture("Xóa không được");
         }
+    }
+
+    public List<CartOrderDTO> getCartByUserId(int userId) {
+        List<CartOrderDTO> result = new ArrayList<>();
+
+        List<Cart> carts = cartRepository.findByUserId(userId);
+
+        for (Cart cart : carts) {
+            CartOrderDTO dto = new CartOrderDTO();
+            dto.setId(cart.getId());
+            dto.setCourseId(cart.getCourseByCourseId().getId());
+            dto.setImage(cart.getCourseByCourseId().getImage());
+            dto.setTeacher(cart.getUserByUserId().getFullname());
+            dto.setPrice(cart.getCourseByCourseId().getPrice());
+            dto.setPromotional_price(cart.getCourseByCourseId().getPromotional_price());
+            dto.setIsDeleted(cart.getIsDeleted());
+            dto.setTitle(cart.getCourseByCourseId().getTitle());
+
+            result.add(dto);
+        }
+
+        return result;
     }
 }

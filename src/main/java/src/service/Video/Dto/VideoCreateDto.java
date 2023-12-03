@@ -16,4 +16,5 @@ public class VideoCreateDto {
     @JsonProperty(value = "courseId")
     private int courseId;
 
+
 }

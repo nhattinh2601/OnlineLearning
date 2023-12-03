@@ -12,6 +12,9 @@ public class Course {
     @Column(name = "course_id", nullable = false)
     private int Id;
     @Basic
+    @Column(name = "title", length = 255)
+    private String title;
+    @Basic
     @Column(name = "price", precision = 0)
     private double price;
     @Basic

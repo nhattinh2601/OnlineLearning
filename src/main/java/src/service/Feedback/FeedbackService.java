@@ -13,6 +13,7 @@ import src.config.dto.Pagination;
 import src.config.exception.NotFoundException;
 import src.config.utils.ApiQuery;
 import src.model.Feedback;
+import src.model.User;
 import src.repository.FeedbackRepository;
 import src.service.Feedback.Dto.FeedbackCreateDto;
 import src.service.Feedback.Dto.FeedbackDto;
@@ -20,6 +21,7 @@ import src.service.Feedback.Dto.FeedbackUpdateDto;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -63,7 +65,7 @@ public class FeedbackService {
         return CompletableFuture.completedFuture(toDto.map(savedFeedback, FeedbackDto.class));
     }
 
-    @Async
+    /*@Async
     public CompletableFuture<FeedbackDto> update(int id, FeedbackUpdateDto feedbacks) {
         Feedback existingFeedback = feedbackRepository.findById(id).orElse(null);
         if (existingFeedback == null)
@@ -71,7 +73,7 @@ public class FeedbackService {
         BeanUtils.copyProperties(feedbacks, existingFeedback);
         existingFeedback.setUpdateAt(new Date(new java.util.Date().getTime()));
         return CompletableFuture.completedFuture(toDto.map(feedbackRepository.save(existingFeedback), FeedbackDto.class));
-    }
+    }*/
 
     @Async
     public CompletableFuture<PagedResultDto<FeedbackDto>> findAllPagination(HttpServletRequest request, Integer limit, Integer skip) {
@@ -99,5 +101,49 @@ public class FeedbackService {
             return CompletableFuture.completedFuture("Xóa không được");
         }
     }
-    
+
+    public Feedback updateFeedback(int feedbackId, Map<String, Object> fieldsToUpdate) {
+        Optional<Feedback> optionalFeedback = feedbackRepository.findById(feedbackId);
+
+        if (optionalFeedback.isPresent()) {
+            Feedback feedback = optionalFeedback.get();
+            updateFeedbackFields(feedback, fieldsToUpdate);
+            feedback.setUpdateAt(new Date());
+            feedbackRepository.save(feedback);
+            return feedback;
+        }
+
+        return null;
+    }
+
+    private void updateFeedbackFields(Feedback feedback, Map<String, Object> fieldsToUpdate) {
+        for (Map.Entry<String, Object> entry : fieldsToUpdate.entrySet()) {
+            String fieldName = entry.getKey();
+            Object value = entry.getValue();
+            updateFeedbackField(feedback, fieldName, value);
+        }
+    }
+
+    private void updateFeedbackField(Feedback feedback, String fieldName, Object value) {
+        switch (fieldName) {
+            case "title":
+                feedback.setTitle((String) value);
+                break;
+            case "content":
+                feedback.setContent((String) value);
+                break;
+            case "image":
+                feedback.setImage((String) value);
+                break;
+
+            case "userId":
+                feedback.setUserId((int) value);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+
 }

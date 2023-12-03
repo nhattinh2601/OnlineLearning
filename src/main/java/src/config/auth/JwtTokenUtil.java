@@ -27,7 +27,7 @@ public class JwtTokenUtil {
 
     @Value("W1vmiY6pBqp6#i!ly^EgP!n9aWcn9yv&A*1r@c%2Cz8lAuW")
     private String secret;
-    @Value("-----BEGIN PUBLIC KEY-----\n" +
+    @Value(" -----BEGIN PUBLIC KEY-----\n" +
             "            MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo\n" +
             "            4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u\n" +
             "            +qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh\n" +
@@ -93,6 +93,7 @@ public class JwtTokenUtil {
     public static String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt(COST));
     }
+
 
     public static boolean comparePassword(String password, String storedHash) {
         return BCrypt.checkpw(password, storedHash);
