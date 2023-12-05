@@ -156,17 +156,22 @@ public class ReviewService {
                 ).collect(Collectors.toList()));
     }
 
-    public List<ReviewUserDTO> getReviewsByUserId(int userId) {
+    public List<ReviewUserDTO> getReviewsByUserId(int courseId) {
         List<ReviewUserDTO> result = new ArrayList<>();
 
-        List<Review> reviews = reviewRepository.findByUserId(userId);
+        List<Review> reviews = reviewRepository.findByCourseId(courseId);
 
         for (Review review : reviews) {
             ReviewUserDTO dto = new ReviewUserDTO();
             dto.setReviewId(review.getId());
             dto.setContent(review.getContent());
             dto.setFullname(review.getUserByUserId().getFullname());
-
+            dto.setAvatar(review.getUserByUserId().getAvatar());
+            dto.setUserId(review.getUserByUserId().getId());
+            dto.setCourseId(review.getCourseId());
+            dto.setIsDeleted(review.getIsDeleted());
+            dto.setCreate(review.getCreateAt());
+            dto.setUpdate(review.getUpdateAt());
             result.add(dto);
         }
 
