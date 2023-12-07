@@ -213,8 +213,22 @@ public class UserService {
         }
     }
 
+    @Async
+    public CompletableFuture<List<UserDto>> findByRoleId(int roleId) {
+        return CompletableFuture.completedFuture(
+                userRepository.findByRoleId(roleId).stream().map(
+                        x -> toDto.map(x, UserDto.class)
+                ).collect(Collectors.toList()));
+    }
 
-
-
+    public String KhoaTaiKhoan(int id) {
+        Optional<User> userOptinal = userRepository.findById(id);
+        if (userOptinal.isPresent()) {
+            User u1 = userOptinal.get();
+            u1.setIsDeleted(true);
+            userRepository.save(u1);
+        }
+        return "User will be block";
+    }
 }
 

@@ -1,6 +1,7 @@
 package src.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -63,5 +64,14 @@ public class UserController {
         return userService.deleteById(id);
     }
 
+    @GetMapping("/role={roleId}")
+    public CompletableFuture<List<UserDto>> findByCourseId(@PathVariable int roleId) {
+        return userService.findByRoleId(roleId);
+    }
+
+    @PatchMapping("/lock-account/{id}")
+    public ResponseEntity<String> lockAccount(@PathVariable int id) {
+        return new ResponseEntity<>(userService.KhoaTaiKhoan(id), HttpStatus.OK);
+    }
 
 }

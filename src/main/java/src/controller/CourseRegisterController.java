@@ -12,13 +12,11 @@ import src.config.dto.PagedResultDto;
 import src.model.Course;
 import src.model.CourseRegister;
 import src.service.CourseRegister.CourseRegisterService;
-import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
-import src.service.CourseRegister.Dto.CourseRegisterDto;
-import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
-import src.service.CourseRegister.Dto.RegisterCourseDTO;
+import src.service.CourseRegister.Dto.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @RestController
@@ -109,4 +107,18 @@ public class CourseRegisterController {
         return courseRegisterService.countStudentsForCourse(courseId);
     }
 
+    @PutMapping("/confirm-payment/{id}")
+    public ResponseEntity<String> regenerateOtp(@PathVariable int id) {
+        return new ResponseEntity<>(courseRegisterService.updateOtpSendEmail(id), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getcoursenoactive")
+    public List<UserRegisterCourse> getName() {
+        return courseRegisterService.getCourseRegisterNoCheck();
+    }
+
+    @PutMapping("/reject-confirm-payment/{id}")
+    public ResponseEntity<String> rejectconfirm(@PathVariable int id) {
+        return new ResponseEntity<>(courseRegisterService.TuChoiGuiMaXacNhan(id), HttpStatus.OK);
+    }
 }

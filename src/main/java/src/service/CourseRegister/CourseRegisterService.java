@@ -22,10 +22,7 @@ import src.repository.CourseRegisterRepository;
 import src.repository.CourseRepository;
 import src.repository.UserRepository;
 import src.service.Category.Dto.CategoryDto;
-import src.service.CourseRegister.Dto.CourseRegisterCreateDto;
-import src.service.CourseRegister.Dto.CourseRegisterDto;
-import src.service.CourseRegister.Dto.CourseRegisterUpdateDto;
-import src.service.CourseRegister.Dto.RegisterCourseDTO;
+import src.service.CourseRegister.Dto.*;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -254,5 +251,49 @@ public class CourseRegisterService {
         return courseRegisterRepository.countDistinctUsersByCourseId(courseId);
     }
 
+    public String updateOtpSendEmail(int id) {
+        Optional<CourseRegister> courseRegister = courseRegisterRepository.findById(id);
+        String otp = otpUtil.generateOtp();
+        emailUtil.guiMakichHoatKhoahoc(courseRegister.get().getUserByUserId().getEmail(), otp, courseRegister.get().getCourseByCourseId().getTitle());
+        if (courseRegister.isPresent()) {
+            CourseRegister cr1 = courseRegister.get();
+            cr1.setOtp(otp);
+            courseRegisterRepository.save(cr1);
+        }
+
+        return "Email sent... please verify account within 1 minute";
+    }
+
+    public List<UserRegisterCourse> getCourseRegisterNoCheck() {
+
+        List<CourseRegister> newestCourses = courseRegisterRepository.findAll()
+                .stream()
+                .filter(courseRegister -> (courseRegister.getIsActive() == null || !courseRegister.getIsActive()) && (courseRegister.getOtp() == null || courseRegister.getOtp().isEmpty()) && courseRegister.getIsDeleted() == null )
+                .collect(Collectors.toList());
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+
+        for (CourseRegister courseRegister : newestCourses) {
+            UserRegisterCourse ur1 = new UserRegisterCourse();
+            ur1.setEmail(courseRegister.getUserByUserId().getEmail());
+            ur1.setUserId(courseRegister.getUserByUserId().getId());
+            ur1.setFullname(courseRegister.getUserByUserId().getFullname());
+            ur1.setCourseId(courseRegister.getCourseByCourseId().getId());
+            ur1.setCourse_name(courseRegister.getCourseByCourseId().getTitle());
+            ur1.setRegister_course_id(courseRegister.getId());
+            userRegisterCourses.add(ur1);
+        }
+        return userRegisterCourses;
+    }
+
+    public String TuChoiGuiMaXacNhan(int id) {
+        Optional<CourseRegister> courseRegister = courseRegisterRepository.findById(id);
+
+        if (courseRegister.isPresent()) {
+            CourseRegister cr1 = courseRegister.get();
+            cr1.setIsDeleted(true);
+            courseRegisterRepository.save(cr1);
+        }
+        return "Course_Register will be detele";
+    }
 }
 
