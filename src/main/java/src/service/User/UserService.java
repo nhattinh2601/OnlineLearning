@@ -230,5 +230,15 @@ public class UserService {
         }
         return "User will be block";
     }
+
+    public String MoKhoaTaiKhoan(int id) {
+        Optional<User> userOptinal = userRepository.findById(id);
+        if (userOptinal.isPresent()) {
+            User u1 = userOptinal.get();
+            u1.setIsDeleted(false);
+            userRepository.save(u1);
+        }
+        return "User will be unblock";
+    }
 }
 

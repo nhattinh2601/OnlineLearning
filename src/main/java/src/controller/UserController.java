@@ -74,4 +74,9 @@ public class UserController {
         return new ResponseEntity<>(userService.KhoaTaiKhoan(id), HttpStatus.OK);
     }
 
+    @PatchMapping("/unlock-account/{id}")
+    public ResponseEntity<String> unlockAccount(@PathVariable int id) {
+        return new ResponseEntity<>(userService.MoKhoaTaiKhoan(id), HttpStatus.OK);
+    }
+
 }
