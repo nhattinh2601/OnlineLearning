@@ -65,7 +65,7 @@ public class CartService {
     public CompletableFuture<CartDto> create(CartOrderDTO cartOrderDTO) {
         try {
             List<Cart> existCart = cartRepository.findCart(
-                    cartOrderDTO.getUserId());
+                    cartOrderDTO.getUserId(), cartOrderDTO.getCourseId());
             List<Orders> existUser = ordersRepository.findUser(
                     cartOrderDTO.getUserId());
             List<OrderItem> existCourse = orderItemRepository.findCourse(
