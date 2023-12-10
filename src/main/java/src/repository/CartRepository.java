@@ -12,8 +12,8 @@ import java.util.UUID;
 @Repository
 public interface CartRepository  extends JpaRepository<Cart, Integer> {
 
-    @Query("SELECT c FROM Cart c WHERE c.userId = :userId AND c.courseId = :courseId AND (c.isDeleted = false OR c.isDeleted IS NULL)")
-    List<Cart> findCart(@Param("userId") int userId, @Param("courseId") int courseId);
+    @Query("SELECT c FROM Cart c WHERE c.userId = :userId AND (c.isDeleted = false OR c.isDeleted IS NULL)")
+    List<Cart> findCart(@Param("userId") int userId);
 
     List<Cart> findByUserId(int userId);
 }
