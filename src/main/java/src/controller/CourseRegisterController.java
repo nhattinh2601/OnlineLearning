@@ -35,10 +35,7 @@ public class CourseRegisterController {
         return courseRegisterService.getOne(id);
     }
 
-   /* @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public CompletableFuture<CourseRegisterDto> create(@RequestBody CourseRegisterCreateDto input) {
-        return courseRegisterService.create(input);
-    }*/
+
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody CourseRegisterCreateDto courseRegisterCreateDto) {
@@ -53,11 +50,6 @@ public class CourseRegisterController {
     public ResponseEntity<String> regenerateOtp(@RequestParam String email) {
         return new ResponseEntity<>(courseRegisterService.regenerateOtp(email), HttpStatus.OK);
     }
-
-    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CompletableFuture<CourseRegisterDto> update(@PathVariable int id, CourseRegisterUpdateDto courseRegister) {
-        return courseRegisterService.update(id, courseRegister);
-    }*/
 
     @PatchMapping("/{courseRegisterId}")
     public ResponseEntity<CourseRegister> updateCourseRegisterField(
@@ -120,5 +112,15 @@ public class CourseRegisterController {
     @PutMapping("/reject-confirm-payment/{id}")
     public ResponseEntity<String> rejectconfirm(@PathVariable int id) {
         return new ResponseEntity<>(courseRegisterService.TuChoiGuiMaXacNhan(id), HttpStatus.OK);
+    }
+
+    @PostMapping("/register-course/{userId}/{courseId}/{otp}")
+    public ResponseEntity<String> registerCourse(@PathVariable int userId, @PathVariable int courseId,@PathVariable String otp) {
+        return new ResponseEntity<>(courseRegisterService.registerCourse(userId,courseId, otp), HttpStatus.OK);
+    }
+
+    @PutMapping("/active-course/{id}")
+    public ResponseEntity<String> activeCourse(@PathVariable int id) {
+        return new ResponseEntity<>(courseRegisterService.activeCourse(id), HttpStatus.OK);
     }
 }

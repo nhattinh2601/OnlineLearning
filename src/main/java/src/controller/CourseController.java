@@ -2,6 +2,7 @@ package src.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +42,7 @@ public class CourseController {
         return courseService.create(input);
     }
 
-    /*@PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public CompletableFuture<CourseDto> update(@PathVariable int id, CourseUpdateDto course) {
-        return courseService.update(id, course);
-    }*/
+
     @PatchMapping("/{courseId}")
     public ResponseEntity<Course> updateCourseField(
             @PathVariable int courseId,
@@ -129,4 +127,18 @@ public class CourseController {
         return courseService.sortCourseInCategory(categoryId, sortName);
     }
 
+    @GetMapping("/getCoursesAndRelateInfo")
+    public List<CourseInfoDTO> getCoursesAndRelateInfo() {
+        return courseService.getCoursesAndRelateInfo();
+    }
+
+    @PatchMapping("/unlock-course/{id}")
+    public ResponseEntity<String> unlockCourse(@PathVariable int id) {
+        return new ResponseEntity<>(courseService.unLockCourse(id), HttpStatus.OK);
+    }
+
+    @PatchMapping("/lock-course/{id}")
+    public ResponseEntity<String> lockCourse(@PathVariable int id) {
+        return new ResponseEntity<>(courseService.lockCourse(id), HttpStatus.OK);
+    }
 }

@@ -23,6 +23,7 @@ import src.repository.CourseRepository;
 import src.repository.UserRepository;
 import src.service.Category.Dto.CategoryDto;
 import src.service.CourseRegister.Dto.*;
+import src.service.Video.Dto.VideoCreateDto;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -63,15 +64,7 @@ public class CourseRegisterService {
     }
 
 
-    /*@Async
-    public CompletableFuture<CourseRegisterDto> create(CourseRegisterCreateDto input) {
-        CourseRegister courseRegister = new CourseRegister();
-        courseRegister.setCourseId(input.getCourseId());
-        courseRegister.setUserId(input.getUserId());
 
-        CourseRegister savedCourseRegister = courseRegisterRepository.save(courseRegister);
-        return CompletableFuture.completedFuture(toDto.map(savedCourseRegister, CourseRegisterDto.class));
-    }*/
 
 
     public String register(CourseRegisterCreateDto courseRegisterDto) {
@@ -268,7 +261,7 @@ public class CourseRegisterService {
 
         List<CourseRegister> newestCourses = courseRegisterRepository.findAll()
                 .stream()
-                .filter(courseRegister -> (courseRegister.getIsActive() == null || !courseRegister.getIsActive()) && (courseRegister.getOtp() == null || courseRegister.getOtp().isEmpty()) && courseRegister.getIsDeleted() == null )
+                .filter(courseRegister ->  courseRegister.getIsDeleted() == null )
                 .collect(Collectors.toList());
         List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
 
@@ -280,6 +273,8 @@ public class CourseRegisterService {
             ur1.setCourseId(courseRegister.getCourseByCourseId().getId());
             ur1.setCourse_name(courseRegister.getCourseByCourseId().getTitle());
             ur1.setRegister_course_id(courseRegister.getId());
+            ur1.setIsActive(courseRegister.getIsActive());
+            ur1.setOtp(courseRegister.getOtp());
             userRegisterCourses.add(ur1);
         }
         return userRegisterCourses;
@@ -295,5 +290,40 @@ public class CourseRegisterService {
         }
         return "Course_Register will be detele";
     }
+
+    public String registerCourse(int user_id, int course_id, String otp) {
+        try{
+            CompletableFuture<CourseRegister> future = new CompletableFuture<>();
+
+            CourseRegister newCr = new CourseRegister();
+            newCr.setCourseId(course_id);
+            newCr.setUserId(user_id);
+            newCr.setIsActive(false);
+            newCr.setOtp(otp);
+            CourseRegister savedVideo = courseRegisterRepository.save(newCr);
+            future.complete(savedVideo);
+
+            return "User registration successful";
+        } catch (Exception e) {
+            // Log the exception or handle it as appropriate for your application
+            e.printStackTrace();
+            return "User registration failed";
+        }
+
+    }
+
+    public String activeCourse(int id) {
+        Optional<CourseRegister> courseRegister = courseRegisterRepository.findById(id);
+        CourseRegister cr1 = courseRegister.get();
+        if (courseRegister.isPresent()) {
+                cr1.setIsActive(true);
+                courseRegisterRepository.save(cr1);
+            }else{
+            return "Course_Register is no actived";
+
+        }
+        return "Course_Register is actived";
+    }
+
 }
 

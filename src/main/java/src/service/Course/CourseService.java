@@ -78,14 +78,7 @@ public class CourseService {
         return CompletableFuture.completedFuture(toDto.map(savedCourse, CourseDto.class));
     }
 
-   /* @Async
-    public CompletableFuture<CourseDto> update(int id, CourseUpdateDto courses) {
-        Course existingCourse = courseRepository.findById(id).orElse(null);
-        if (existingCourse == null)
-            throw new NotFoundException("Unable to find course!");
-        BeanUtils.copyProperties(courses, existingCourse);
-        return CompletableFuture.completedFuture(toDto.map(courseRepository.save(existingCourse), CourseDto.class));
-    }*/
+
 
     public Course updateCourse(int courseId, Map<String, Object> fieldsToUpdate) {
         Optional<Course> optionalCourse = courseRepository.findById(courseId);
@@ -406,5 +399,36 @@ public class CourseService {
     }
 
 
+    public List<CourseInfoDTO> getCoursesAndRelateInfo() {
+        List<Course> newCourses = courseRepository.findAll()
+                .stream()
+                .collect(Collectors.toList());
+        List<CourseInfoDTO> courseRelateInfo = new ArrayList<>();
 
+        for (Course course : newCourses) {
+            CourseInfoDTO ur1 = convertCourseToCourseInfoDTO(course);;
+            courseRelateInfo.add(ur1);
+        }
+        return courseRelateInfo;
+    }
+
+    public String lockCourse(int id) {
+        Optional<Course> courseOptinal = courseRepository.findById(id);
+        if (courseOptinal.isPresent()) {
+            Course u1 = courseOptinal.get();
+            u1.setActive(false);
+            courseRepository.save(u1);
+        }
+        return "Course will be lock";
+    }
+
+    public String unLockCourse(int id) {
+        Optional<Course> courseOptinal = courseRepository.findById(id);
+        if (courseOptinal.isPresent()) {
+            Course u1 = courseOptinal.get();
+            u1.setActive(true);
+            courseRepository.save(u1);
+        }
+        return "Course will be unlock";
+    }
 }

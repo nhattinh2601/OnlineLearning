@@ -16,10 +16,10 @@ public class UserRegisterCourse {
 
     private int courseId;
 
-
+    private Boolean isActive;
     private String course_name;
 
-
+    private String otp;
     private int userId;
 
     private String email;

@@ -8,10 +8,10 @@ public class OtpUtil {
 
     public String generateOtp() {
         Random random = new Random();
-        int randomNumber = random.nextInt(999999);
+        int randomNumber = random.nextInt(9);
         String output = Integer.toString(randomNumber);
 
-        while (output.length() < 6) {
+        while (output.length() < 1) {
             output = "0" + output;
         }
         return output;
