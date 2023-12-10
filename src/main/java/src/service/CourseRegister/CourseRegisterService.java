@@ -26,7 +26,10 @@ import src.service.CourseRegister.Dto.*;
 import src.service.Video.Dto.VideoCreateDto;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -324,6 +327,61 @@ public class CourseRegisterService {
         }
         return "Course_Register is actived";
     }
+
+    public int totalSoldCourseInMonth(String monthYear) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfMonth = LocalDate.parse("01-" + monthYear, formatter).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
+
+        Date startDate = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+
+        return courseRegisters.size();
+    }
+
+    public int totalSoldCourseInYear(String year) {
+        LocalDateTime startOfYear = LocalDate.parse(year + "-01-01").atStartOfDay();
+        LocalDateTime endOfYear = startOfYear.plusYears(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfYear.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfYear.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+
+        return courseRegisters.size();
+    }
+
+    public int totalSoldCourseInDay(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+
+        return courseRegisters.size();
+    }
+
+
 
 }
 

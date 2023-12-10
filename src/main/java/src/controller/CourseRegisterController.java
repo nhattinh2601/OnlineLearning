@@ -123,4 +123,18 @@ public class CourseRegisterController {
     public ResponseEntity<String> activeCourse(@PathVariable int id) {
         return new ResponseEntity<>(courseRegisterService.activeCourse(id), HttpStatus.OK);
     }
+
+    @GetMapping("/total-sold-in-month/{monthYear}")
+    public int getTotalSoldCourseInMonth(@PathVariable String monthYear) {
+        return courseRegisterService.totalSoldCourseInMonth(monthYear);
+    }
+
+    @GetMapping("/total-sold-in-year/{year}")
+    public int getTotalSoldCourseInYear(@PathVariable String year) {
+        return courseRegisterService.totalSoldCourseInYear(year);
+    }
+    @GetMapping("/total-sold-in-day/{day}")
+    public int getTotalSoldCourseInDay(@PathVariable String day) {
+        return courseRegisterService.totalSoldCourseInDay(day);
+    }
 }
