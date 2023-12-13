@@ -380,6 +380,11 @@ public class CourseRegisterService {
 
         return courseRegisters.size();
     }
+    public boolean isCourseRegisterValid(int userId, int courseId) {
+        Optional<CourseRegister> optionalCourseRegister = courseRegisterRepository.findByUserIdAndCourseIdAndIsActiveAndIsDeletedNot(userId, courseId);
+        return optionalCourseRegister.isPresent();
+    }
+
 
 
 

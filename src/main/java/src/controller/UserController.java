@@ -23,8 +23,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-
-
     @GetMapping( "/{id}")
     public CompletableFuture<UserDto> findOneById(@PathVariable int id) {
         return userService.getOne(id);

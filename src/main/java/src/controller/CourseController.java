@@ -141,4 +141,20 @@ public class CourseController {
     public ResponseEntity<String> lockCourse(@PathVariable int id) {
         return new ResponseEntity<>(courseService.lockCourse(id), HttpStatus.OK);
     }
+
+    //
+    @GetMapping("/countByUsers/{userId}")
+    public int countVideosByCourseId(@PathVariable int userId) {
+        return courseService.countCoursesByUserId(userId);
+    }
+
+    @PostMapping("/updateRating/{courseId}")
+    public ResponseEntity<String> updateCourseRating(@PathVariable int courseId) {
+        try {
+            courseService.updateCourseRatingByCourseId(courseId);
+            return new ResponseEntity<>("Course rating updated successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to update course rating.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

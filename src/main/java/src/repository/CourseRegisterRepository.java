@@ -29,4 +29,10 @@ public interface CourseRegisterRepository extends JpaRepository<CourseRegister, 
             @Param("isDeleted") Boolean isDeleted
     );
 
+    @Query("SELECT cr FROM CourseRegister cr WHERE cr.userId = :userId AND cr.courseId = :courseId AND cr.isActive = true AND (cr.isDeleted = false OR cr.isDeleted IS NULL)")
+    Optional<CourseRegister> findByUserIdAndCourseIdAndIsActiveAndIsDeletedNot(
+            @Param("userId") int userId,
+            @Param("courseId") int courseId
+    );
+
 }

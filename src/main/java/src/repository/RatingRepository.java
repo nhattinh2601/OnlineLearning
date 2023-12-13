@@ -23,4 +23,7 @@ public interface RatingRepository extends JpaRepository<Rating, Integer> {
 
     @Query("SELECT r FROM Rating r WHERE r.userId = :userId AND r.courseId = :courseId AND (r.isDeleted = false OR r.isDeleted IS NULL)")
     List<Rating> findRatingByUserCourse(@Param("userId") int userId, @Param("courseId") int courseId);
+
+    @Query("SELECT AVG(r.Rating) FROM Rating r WHERE r.courseId = :courseId AND (r.isDeleted = false OR r.isDeleted IS NULL)")
+    Double calculateAverageRatingByCourseId(@Param("courseId") int courseId);
 }

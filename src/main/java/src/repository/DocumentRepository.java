@@ -12,6 +12,6 @@ import java.util.List;
 public interface DocumentRepository extends JpaRepository<Document, Integer> {
     List<Document> findByCourseId(int courseId);
 
-    @Query("SELECT COUNT(d) FROM Document d WHERE d.courseId = :courseId")
+    @Query("SELECT COUNT(d) FROM Document d WHERE d.courseId = :courseId AND (d.isDeleted = false OR d.isDeleted IS NULL)")
     int countByCourseId(int courseId);
 }

@@ -35,10 +35,10 @@ public class User implements UserDetails {
     @Column(name = "bank_name", length = 50)
     private String bank_name;
     @Basic
-    @Column(name = "account_number", length = 20)
+    @Column(name = "account_number", length = 50)
     private String account_number;
     @Basic
-    @Column(name = "account_name", length = 20)
+    @Column(name = "account_name", length = 50)
     private String account_name;
     @Basic
     @Column(name = "password", nullable = false, length = 50)

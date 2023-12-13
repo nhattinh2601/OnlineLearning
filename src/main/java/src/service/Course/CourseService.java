@@ -431,4 +431,24 @@ public class CourseService {
         }
         return "Course will be unlock";
     }
+
+    public int countCoursesByUserId(int userId) {
+        return courseRepository.countByUserId(userId);
+    }
+
+    public void updateCourseRatingByCourseId(int courseId) {
+        // Calculate the average rating for the given courseId
+        Double averageRating = ratingRepository.calculateAverageRatingByCourseId(courseId);
+
+        // Round up to the nearest integer
+        int roundedRating = averageRating != null ? (int) Math.ceil(averageRating) : 0;
+
+        // Update the Course entity with the new rounded rating
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (course != null) {
+            course.setRating(roundedRating);
+            courseRepository.save(course);
+        }
+    }
+
 }

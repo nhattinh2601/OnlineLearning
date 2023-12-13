@@ -17,4 +17,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> findByCategoryId(int categoryId);
     List<Course> findByUserId(int userId);
 
+    @Query("SELECT COUNT(c) FROM Course c WHERE c.userId = :userId AND (c.isDeleted = false OR c.isDeleted IS NULL)")
+    int countByUserId(int userId);
+
 }

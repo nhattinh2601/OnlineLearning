@@ -87,6 +87,11 @@ public class VideoController {
     public int countVideosByCourseId(@PathVariable int courseId) {
         return videoService.countVideosByCourseId(courseId);
     }
+    @GetMapping("/check/{videoId}/{courseId}")
+    public boolean checkVideoInCourse(@PathVariable int videoId, @PathVariable int courseId) {
+        return videoService.isVideoInCourse(videoId, courseId);
+    }
+
 
 
 

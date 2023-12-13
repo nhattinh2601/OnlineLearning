@@ -47,6 +47,4 @@ public class RoleController {
         return roleService.deleteById(id);
     }
 
-
-
 }

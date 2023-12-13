@@ -165,5 +165,10 @@ public class VideoService {
         return videoRepository.countByCourseId(courseId);
     }
 
+    public boolean isVideoInCourse(int videoId, int courseId) {
+        Video video = videoRepository.findById(videoId).orElse(null);
+        return video != null && video.getCourseId() == courseId;
+    }
+
 }
 

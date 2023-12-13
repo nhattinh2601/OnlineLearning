@@ -137,4 +137,13 @@ public class CourseRegisterController {
     public int getTotalSoldCourseInDay(@PathVariable String day) {
         return courseRegisterService.totalSoldCourseInDay(day);
     }
+
+    @GetMapping("/check/{userId}/{courseId}")
+    public String checkCourseRegister(@PathVariable int userId, @PathVariable int courseId) {
+        if (courseRegisterService.isCourseRegisterValid(userId, courseId)) {
+            return "True";
+        } else {
+            return "False";
+        }
+    }
 }
