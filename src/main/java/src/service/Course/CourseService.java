@@ -272,6 +272,8 @@ public class CourseService {
         ur1.setCreated_at(course.getCreateAt());
         ur1.setUpdate_at(course.getUpdateAt());
         ur1.setRating(course.getRating());
+        ur1.setCreateAt(course.getCreateAt());
+        ur1.setUpdateAt(course.getUpdateAt());
         return ur1;
     }
 
@@ -451,4 +453,8 @@ public class CourseService {
         }
     }
 
+    public boolean isCourseInUser(int courseId, int userId) {
+        Course course = courseRepository.findById(courseId).orElse(null);
+        return course != null && course.getUserId() == userId;
+    }
 }

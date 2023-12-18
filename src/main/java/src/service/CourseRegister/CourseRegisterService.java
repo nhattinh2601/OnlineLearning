@@ -278,6 +278,10 @@ public class CourseRegisterService {
             ur1.setRegister_course_id(courseRegister.getId());
             ur1.setIsActive(courseRegister.getIsActive());
             ur1.setOtp(courseRegister.getOtp());
+            ur1.setUpdateAt(courseRegister.getUpdateAt());
+            ur1.setCreateAt(courseRegister.getCreateAt());
+            ur1.setPhone(courseRegister.getUserByUserId().getPhone());
+            ur1.setPrice(courseRegister.getCourseByCourseId().getPromotional_price());
             userRegisterCourses.add(ur1);
         }
         return userRegisterCourses;

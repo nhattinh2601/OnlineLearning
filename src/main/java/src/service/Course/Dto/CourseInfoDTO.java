@@ -42,4 +42,8 @@ public class CourseInfoDTO {
     private double rating;
 
     private int user_registers;
+
+    public Date createAt ;
+
+    public Date updateAt ;
 }

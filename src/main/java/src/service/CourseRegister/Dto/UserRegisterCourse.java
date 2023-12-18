@@ -9,11 +9,18 @@ ProjectName: OnlineLearning
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class UserRegisterCourse {
 
     private String fullname;
+    private String phone;
 
+    public Date createAt ;
+
+    public Date updateAt ;
+    private double price;
     private int courseId;
 
     private Boolean isActive;

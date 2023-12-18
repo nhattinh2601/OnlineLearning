@@ -141,9 +141,9 @@ public class CourseRegisterController {
     @GetMapping("/check/{userId}/{courseId}")
     public String checkCourseRegister(@PathVariable int userId, @PathVariable int courseId) {
         if (courseRegisterService.isCourseRegisterValid(userId, courseId)) {
-            return "True";
+            return "true";
         } else {
-            return "False";
+            return "false";
         }
     }
 }

@@ -157,4 +157,9 @@ public class CourseController {
             return new ResponseEntity<>("Failed to update course rating.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/check/{courseId}/{userId}")
+    public boolean checkVideoInCourse(@PathVariable int courseId, @PathVariable int userId) {
+        return courseService.isCourseInUser(courseId, userId);
+    }
 }
