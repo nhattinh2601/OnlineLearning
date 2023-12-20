@@ -350,6 +350,203 @@ public class CourseRegisterService {
         return courseRegisters.size();
     }
 
+    public int totalCourse() {
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourseAll(
+                true,
+                false
+        );
+        return courseRegisters.size();
+    }
+
+    public int totalCoursePerTeacher(int teacherId) {
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourseAll(
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        int count = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                count ++;
+            }
+        }
+        return count;
+    }
+
+    public double totalPrice() {
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourseAll(
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+        }
+        return totalPrice;
+    }
+
+    public double totalPricePerTeacher(int teacherId) {
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourseAll(
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+            }
+        }
+        return totalPrice*0.75;
+    }
+
+    public double totalPriceCourseInMonth(String monthYear) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfMonth = LocalDate.parse("01-" + monthYear, formatter).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
+
+        Date startDate = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+        }
+        return totalPrice;
+    }
+
+    public double totalPriceCourseInDay(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+        }
+        return totalPrice;
+    }
+
+    public double totalPriceCourseInDayPerTeacher(String date, int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+            }
+        }
+        return totalPrice*0.75;
+    }
+
+    public int totalCourseInDayPerTeacher(String date, int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        int count = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public double totalPriceCourseInMonthPerTeacher(String monthYear, int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfMonth = LocalDate.parse("01-" + monthYear, formatter).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
+
+        Date startDate = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+            }
+        }
+        return totalPrice*0.75;
+    }
+
+    public int totalCourseInMonthPerTeacher(String monthYear, int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfMonth = LocalDate.parse("01-" + monthYear, formatter).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusSeconds(1);
+
+        Date startDate = Date.from(startOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfMonth.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        int count = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                count++;
+            }
+        }
+        return count;
+    }
+
     public int totalSoldCourseInYear(String year) {
         LocalDateTime startOfYear = LocalDate.parse(year + "-01-01").atStartOfDay();
         LocalDateTime endOfYear = startOfYear.plusYears(1).minusNanos(1);
@@ -379,6 +576,24 @@ public class CourseRegisterService {
                 startDate,
                 endDate,
                 true,
+                false
+        );
+
+        return courseRegisters.size();
+    }
+
+    public int totalSoldCourseInDayNoActive(String date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.plusDays(1).minusNanos(1);
+
+        Date startDate = Date.from(startOfDay.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(endOfDay.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                false,
                 false
         );
 

@@ -129,6 +129,11 @@ public class CourseRegisterController {
         return courseRegisterService.totalSoldCourseInMonth(monthYear);
     }
 
+    @GetMapping("/total-price-in-month/{monthYear}")
+    public double getTotalPriceCourseInMonth(@PathVariable String monthYear) {
+        return courseRegisterService.totalPriceCourseInMonth(monthYear);
+    }
+
     @GetMapping("/total-sold-in-year/{year}")
     public int getTotalSoldCourseInYear(@PathVariable String year) {
         return courseRegisterService.totalSoldCourseInYear(year);
@@ -136,6 +141,55 @@ public class CourseRegisterController {
     @GetMapping("/total-sold-in-day/{day}")
     public int getTotalSoldCourseInDay(@PathVariable String day) {
         return courseRegisterService.totalSoldCourseInDay(day);
+    }
+    @GetMapping("/total-sold")
+    public int getTotalSold() {
+        return courseRegisterService.totalCourse();
+    }
+
+    @GetMapping("/total-price")
+    public double getTotalPrice() {
+        return courseRegisterService.totalPrice();
+    }
+
+    @GetMapping("/total-price-in-day/{day}")
+    public double getTotalPriceCourseInDay(@PathVariable String day) {
+        return courseRegisterService.totalPriceCourseInDay(day);
+    }
+
+    @GetMapping("/total-price-in-day-per-teacher/{day}/{teacherId}")
+    public double getTotalPriceCourseInDay(@PathVariable String day, @PathVariable int teacherId) {
+        return courseRegisterService.totalPriceCourseInDayPerTeacher(day,teacherId);
+    }
+
+    @GetMapping("/total-price-in-month-per-teacher/{day}/{teacherId}")
+    public double getTotalPriceCourseInMonth(@PathVariable String day, @PathVariable int teacherId) {
+        return courseRegisterService.totalPriceCourseInMonthPerTeacher(day,teacherId);
+    }
+
+    @GetMapping("/total-course-in-month-per-teacher/{day}/{teacherId}")
+    public double getTotalCourseCourseInMonth(@PathVariable String day, @PathVariable int teacherId) {
+        return courseRegisterService.totalCourseInMonthPerTeacher(day,teacherId);
+    }
+
+    @GetMapping("/total-course-in-day-per-teacher/{day}/{teacherId}")
+    public double getTotalCourseCourseInDay(@PathVariable String day, @PathVariable int teacherId) {
+        return courseRegisterService.totalCourseInDayPerTeacher(day,teacherId);
+    }
+
+    @GetMapping("/total-course-per-teacher/{teacherId}")
+    public double getTotalCoursePerTeacher(@PathVariable int teacherId) {
+        return courseRegisterService.totalCoursePerTeacher(teacherId);
+    }
+
+    @GetMapping("/total-price-per-teacher/{teacherId}")
+    public double getTotalPricePerTeacher(@PathVariable int teacherId) {
+        return courseRegisterService.totalPricePerTeacher(teacherId);
+    }
+
+    @GetMapping("/total-sold-in-day-no-active/{day}")
+    public int getTotalSoldCourseInDayNoActive(@PathVariable String day) {
+        return courseRegisterService.totalSoldCourseInDayNoActive(day);
     }
 
     @GetMapping("/check/{userId}/{courseId}")
