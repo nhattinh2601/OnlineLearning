@@ -425,6 +425,95 @@ public class CourseRegisterService {
         return totalPrice;
     }
 
+    //totalPriceInTime
+    public double totalPriceInTime(String dateBegin, String dateFinish) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime dateStart = LocalDate.parse(dateBegin, formatter).atStartOfDay();
+        LocalDateTime dateEnd = LocalDate.parse(dateFinish, formatter).atStartOfDay();
+
+        Date startDate = Date.from(dateStart.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(dateEnd.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        List<UserRegisterCourse> userRegisterCourses = new ArrayList<>();
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+        }
+        return totalPrice;
+    }
+    //totalSoldInTime
+    public int totalSoldInTime(String dateBegin, String dateFinish) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime dateStart = LocalDate.parse(dateBegin, formatter).atStartOfDay();
+        LocalDateTime dateEnd = LocalDate.parse(dateFinish, formatter).atStartOfDay();
+
+        Date startDate = Date.from(dateStart.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(dateEnd.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        return courseRegisters.size();
+    }
+    //totalPriceInTimePerTeacher
+    public double totalPriceInTimePerTeacher(String dateBegin, String dateFinish,int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime dateStart = LocalDate.parse(dateBegin, formatter).atStartOfDay();
+        LocalDateTime dateEnd = LocalDate.parse(dateFinish, formatter).atStartOfDay();
+
+        Date startDate = Date.from(dateStart.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(dateEnd.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        double totalPrice = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                totalPrice += courseRegister.getCourseByCourseId().getPromotional_price();
+            }
+        }
+        return totalPrice*0.75;
+    }
+    //totalSoldInTimePerTeacher
+    public int totalSoldInTimePerTeacher(String dateBegin, String dateFinish,int teacherId) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        LocalDateTime dateStart = LocalDate.parse(dateBegin, formatter).atStartOfDay();
+        LocalDateTime dateEnd = LocalDate.parse(dateFinish, formatter).atStartOfDay();
+
+        Date startDate = Date.from(dateStart.atZone(ZoneId.systemDefault()).toInstant());
+        Date endDate = Date.from(dateEnd.atZone(ZoneId.systemDefault()).toInstant());
+
+        List<CourseRegister> courseRegisters = courseRegisterRepository.findTotalSoldCourse(
+                startDate,
+                endDate,
+                true,
+                false
+        );
+        int count = 0;
+        for (CourseRegister courseRegister : courseRegisters) {
+            int teacher_id = courseRegister.getCourseByCourseId().getUserId();
+            if(teacher_id==teacherId){
+                count++;
+            }
+        }
+        return count;
+    }
+
+
     public double totalPriceCourseInDay(String date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         LocalDateTime startOfDay = LocalDate.parse(date, formatter).atStartOfDay();

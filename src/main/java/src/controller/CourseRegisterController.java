@@ -200,4 +200,24 @@ public class CourseRegisterController {
             return "false";
         }
     }
+
+    @GetMapping("/total-price-in-time/{begin}/{end}")
+    public double getTotalPriceInTime(@PathVariable String begin,@PathVariable String end) {
+        return courseRegisterService.totalPriceInTime(begin, end);
+    }
+
+    @GetMapping("/total-sold-in-time/{begin}/{end}")
+    public double getTotalSoldInTime(@PathVariable String begin,@PathVariable String end) {
+        return courseRegisterService.totalSoldInTime(begin, end);
+    }
+
+    @GetMapping("/total-price-in-time-per-teacher/{begin}/{end}/{teacherId}")
+    public double getTotalPriceInTimePerTeacher(@PathVariable String begin,@PathVariable String end, @PathVariable int teacherId) {
+        return courseRegisterService.totalPriceInTimePerTeacher(begin, end, teacherId);
+    }
+
+    @GetMapping("/total-sold-in-time-per-teacher/{begin}/{end}/{teacherId}")
+    public double getTotalSoldInTimePerTeacher(@PathVariable String begin,@PathVariable String end, @PathVariable int teacherId) {
+        return courseRegisterService.totalSoldInTimePerTeacher(begin, end, teacherId);
+    }
 }
